@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './NotFound.css';
+import './NotFoundPage.css';
 
-const NotFound = () => {
+const NotFoundPage = () => {
   return (
     <div className="not-found">
-      <div>Ooops ; (</div>
+      <div>404</div>
+      <hr />
+      <div>Ooops ;&nbsp;(</div>
       <div>page not found</div>
       <Link to="/">home</Link>
       <br />
@@ -13,4 +15,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default NotFoundPage;
