@@ -1,5 +1,7 @@
+import Cards from 'components/Cards/Cards';
 import Search from 'components/Search/Search';
 import React, { Component, FormEvent } from 'react';
+import data from '../Cards/data';
 
 class Main extends Component {
   state = {
@@ -26,6 +28,7 @@ class Main extends Component {
           handleOnChange={this.handleOnChange}
           handleOnSubmit={this.handleOnSubmit}
         />
+        <Cards data={data} />
       </div>
     );
   }
