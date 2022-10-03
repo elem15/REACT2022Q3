@@ -1,5 +1,6 @@
 {
   "name": "my-app",
+  "homepage": "https://rolling-scopes-school.github.io/elem15-REACT2022Q3",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -17,6 +18,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -49,6 +52,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.31.8",
+    "gh-pages": "^4.0.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.4.1",
     "prettier": "^2.6.2",
