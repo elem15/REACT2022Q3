@@ -18,6 +18,7 @@ class Search extends Component<IProps> {
         <form className="search-form" onSubmit={props.handleOnSubmit}>
           <input
             className="search-items"
+            name="search"
             type="search"
             placeholder="search"
             value={props.searchValue}

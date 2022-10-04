@@ -1,7 +1,7 @@
 import Cards from 'components/Cards/Cards';
 import Search from 'components/Search/Search';
 import React, { Component, FormEvent } from 'react';
-import data from '../Cards/data';
+import data from '../../MockData/data';
 
 class Main extends Component {
   state = {
