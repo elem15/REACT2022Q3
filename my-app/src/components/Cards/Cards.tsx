@@ -5,16 +5,16 @@ import './Cards.css';
 export interface IProps {
   id: string;
   index: number;
-  isActive: boolean;
-  price: string;
+  isActive: boolean | null;
+  price: number;
   picture: string;
-  company: string;
+  houseType: string;
   email: string;
   phone: string;
   address: string;
   about: string;
 }
-interface IData {
+export interface IData {
   data: IProps[];
 }
 

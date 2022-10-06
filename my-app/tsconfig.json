@@ -13,7 +13,6 @@
     "strict": true,
     "skipLibCheck": true,
     "baseUrl": "./src",
-    // "strictNullChecks": false,
     "resolveJsonModule": true
   },
   "include": ["./src/**/*", "styled.d.ts"]

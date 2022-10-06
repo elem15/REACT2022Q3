@@ -1,37 +1,61 @@
+import { IProps } from 'components/Cards/Cards';
 import React, { Component, createRef, FormEvent } from 'react';
+import './Form.css';
 
-interface MyFormValues {
-  address: HTMLInputElement;
+interface IFormProps {
+  handleFormSubmit: (house: IProps) => void;
 }
-
-class Form extends Component {
+class Form extends Component<IFormProps> {
   state = {
-    imgPath: '',
-  };
+    id: '',
+    index: 0,
+    isActive: null,
+    price: 0,
+    picture: '',
+    houseType: '',
+    email: '',
+    phone: '',
+    about: '',
+    address: '',
+  } as IProps;
   fileInput = createRef<HTMLInputElement>();
-  handleOnSubmit = (e: FormEvent) => {
+  addressInput = createRef<HTMLInputElement>();
+
+  handleOnSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const form = e.currentTarget as EventTarget & Element & MyFormValues;
-    console.log(form.address.value);
+    console.log(this.addressInput.current?.value);
+    await this.setState({
+      address: this.addressInput.current?.value,
+    });
     const current = this.fileInput.current as HTMLInputElement;
     const { files } = current;
-    if (files != null) console.log(URL.createObjectURL(files[0]));
-    this.setState(() => {
-      if (files != null) {
-        return { imgPath: URL.createObjectURL(files[0]) };
+    await this.setState(() => {
+      if (files != null && files[0]) {
+        return { picture: URL.createObjectURL(files[0]) };
+      } else {
+        return { picture: '' };
       }
     });
+    await this.props.handleFormSubmit(this.state);
   };
+
   render(): React.ReactNode {
     return (
-      <div>
+      <section className="section">
         <form action="" onSubmit={this.handleOnSubmit}>
-          <input type="text" name="address" />
+          <input
+            type="text"
+            name="address"
+            placeholder="address"
+            defaultValue=""
+            ref={this.addressInput}
+          />
+          <br />
           <input type="file" accept="image/*" ref={this.fileInput} />
-          <input type="submit" />
+          <br />
+          <button type="submit">send</button>
         </form>
-        <img src={this.state.imgPath} style={{ width: '300px' }} alt="" />
-      </div>
+      </section>
     );
   }
 }

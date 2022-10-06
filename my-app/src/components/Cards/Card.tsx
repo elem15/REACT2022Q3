@@ -10,8 +10,14 @@ const Card = (props: CardProps) => {
       <div>
         <img className="card-img" src={props.data.picture} alt="" />
       </div>
-      <div>{props.data.price}</div>
-      <div>{props.data.address}</div>
+      <div>address: {props.data.address}</div>
+      <div>type: {props.data.houseType}</div>
+      <div>
+        price:&nbsp;
+        {props.data.price.toLocaleString('us-US', { style: 'currency', currency: 'USD' })}
+      </div>
+      <div>{props.data.isActive ? 'is on sale' : 'sold'}</div>
+      <div className="features">features: {props.data.about}</div>
     </div>
   );
 };

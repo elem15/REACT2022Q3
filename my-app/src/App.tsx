@@ -6,7 +6,7 @@ import Home from 'components/Main/Main';
 import Layout from 'components/Layout/Layout';
 import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
-import Form from 'components/Form/Form';
+import FormContainer from 'components/Form/FormContainer';
 
 function App() {
   return (
@@ -14,7 +14,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/form" element={<Form />} />
+          <Route path="/form" element={<FormContainer />} />
           <Route path="/about" element={<About />} />
           <Route path="/404" element={<NotFoundPage />} />
           <Route path="*" element={<Navigate to="/404" replace />} />
