@@ -9,6 +9,7 @@ interface IFormComponentProps {
   date: React.RefObject<HTMLInputElement>;
   addressError: boolean;
   dateError: boolean;
+  formIsActive: boolean;
 }
 const FormComponent = (props: IFormComponentProps) => {
   return (
@@ -36,7 +37,9 @@ const FormComponent = (props: IFormComponentProps) => {
         <br />
         <input type="file" accept="image/*" ref={props.file} />
         <br />
-        <button type="submit">send</button>
+        <button disabled={!props.formIsActive} type="submit">
+          send
+        </button>
       </form>
     </section>
   );

@@ -7,10 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 interface IFormProps {
   handleFormSubmit: (house: IProps) => void;
 }
-interface IFormInputs {
-  address: HTMLInputElement;
-}
+
 export interface IValidateState {
+  formIsActive: boolean;
   validate: {
     id: boolean;
     index: boolean;
@@ -50,6 +49,7 @@ class FormContainer extends Component<IFormProps> {
     about: '',
     address: '',
     date: '',
+    formIsActive: false,
     validate: {
       id: true,
       index: true,
@@ -68,21 +68,28 @@ class FormContainer extends Component<IFormProps> {
   file = createRef<HTMLInputElement>();
   date = createRef<HTMLInputElement>();
   address = createRef<HTMLInputElement>();
-  handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
-    this.setState((prevState: Readonly<IValidateState>) => {
+  handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    await this.setState((prevState: Readonly<IValidateState>) => {
       const validate = prevState.validate;
       return {
         validate: { ...validate, [e.target.name]: true },
       };
     });
+    const arr = await Object.values(this.state.validate);
+    if (!arr.includes(false)) {
+      console.log(true);
+      await this.setState({ formIsActive: true });
+    }
   };
   handleOnSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
     const address = this.address.current?.value;
     if (!addressValidate(address)) {
       await this.setState((prevState: Readonly<IValidateState>) => {
         const validate = prevState.validate;
         return {
+          formIsActive: false,
           validate: { ...validate, address: false },
         };
       });
@@ -92,6 +99,7 @@ class FormContainer extends Component<IFormProps> {
       await this.setState((prevState: Readonly<IValidateState>) => {
         const validate = prevState.validate;
         return {
+          formIsActive: false,
           validate: { ...validate, date: false },
         };
       });
@@ -123,6 +131,7 @@ class FormContainer extends Component<IFormProps> {
         address={this.address}
         addressError={!this.state.validate.address}
         dateError={!this.state.validate.date}
+        formIsActive={this.state.formIsActive}
         date={this.date}
         file={this.file}
       />
