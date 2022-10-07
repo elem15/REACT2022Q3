@@ -6,7 +6,7 @@ import Home from 'components/Main/Main';
 import Layout from 'components/Layout/Layout';
 import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
-import FormContainer from 'components/Form/FormContainer';
+import FormContainer from 'components/Form/FormPageContainer';
 
 function App() {
   return (

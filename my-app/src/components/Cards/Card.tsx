@@ -5,6 +5,7 @@ interface CardProps {
   data: IProps;
 }
 const Card = (props: CardProps) => {
+  console.log(props.data.dateOfPublish);
   return (
     <div className="card">
       <div>
@@ -18,6 +19,7 @@ const Card = (props: CardProps) => {
       </div>
       <div>{props.data.isActive ? 'is on sale' : 'sold'}</div>
       <div className="features">features: {props.data.about}</div>
+      <div className="">ad publication date: {props.data.dateOfPublish}</div>
     </div>
   );
 };

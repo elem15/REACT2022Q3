@@ -1,24 +1,57 @@
-import Cards, { IData, IProps } from 'components/Cards/Cards';
-import React, { Component } from 'react';
-import Form from './Form';
+import { IProps } from 'components/Cards/Cards';
+import React, { Component, createRef, FormEvent } from 'react';
+import './Form.css';
+import FormComponent from './FormComponent';
 
-class FormContainer extends Component {
+interface IFormProps {
+  handleFormSubmit: (house: IProps) => void;
+}
+class FormContainer extends Component<IFormProps> {
   state = {
-    data: [] as IProps[],
-  };
-  handleFormSubmit = async (house: IProps) => {
-    await this.setState((prevState: Readonly<IData>) => {
-      const { data } = prevState;
-      const newData = [...data, house];
-      return { data: newData };
+    id: '',
+    index: 0,
+    isActive: null,
+    price: 0,
+    picture: '',
+    houseType: '',
+    email: '',
+    phone: '',
+    about: '',
+    address: '',
+    dateOfPublish: '',
+  } as IProps;
+  fileInput = createRef<HTMLInputElement>();
+  dateInput = createRef<HTMLInputElement>();
+  addressInput = createRef<HTMLInputElement>();
+
+  handleOnSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log(this.addressInput.current?.value);
+    console.log(this.dateInput.current?.value);
+    await this.setState({
+      address: this.addressInput.current?.value,
+      dateOfPublish: this.dateInput.current?.value,
     });
+    const current = this.fileInput.current as HTMLInputElement;
+    const { files } = current;
+    await this.setState(() => {
+      if (files != null && files[0]) {
+        return { picture: URL.createObjectURL(files[0]) };
+      } else {
+        return { picture: '' };
+      }
+    });
+    await this.props.handleFormSubmit(this.state);
   };
-  render() {
+
+  render(): React.ReactNode {
     return (
-      <div>
-        <Form handleFormSubmit={this.handleFormSubmit} />
-        <Cards data={this.state.data} />
-      </div>
+      <FormComponent
+        handleOnSubmit={this.handleOnSubmit}
+        addressInput={this.addressInput}
+        dateInput={this.dateInput}
+        fileInput={this.fileInput}
+      />
     );
   }
 }
