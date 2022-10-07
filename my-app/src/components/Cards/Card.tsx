@@ -5,21 +5,22 @@ interface CardProps {
   data: IProps;
 }
 const Card = (props: CardProps) => {
-  console.log(props.data.dateOfPublish);
   return (
     <div className="card">
       <div>
         <img className="card-img" src={props.data.picture} alt="" />
       </div>
-      <div>address: {props.data.address}</div>
-      <div>type: {props.data.houseType}</div>
-      <div>
-        price:&nbsp;
-        {props.data.price.toLocaleString('us-US', { style: 'currency', currency: 'USD' })}
-      </div>
-      <div>{props.data.isActive ? 'is on sale' : 'sold'}</div>
-      <div className="features">features: {props.data.about}</div>
-      <div className="">ad publication date: {props.data.dateOfPublish}</div>
+      {props.data.address && <div>address: {props.data.address}</div>}
+      {props.data.houseType && <div> type: {props.data.houseType}</div>}
+      {props.data.price > 0 && (
+        <div>
+          price:&nbsp;
+          {props.data.price.toLocaleString('us-US', { style: 'currency', currency: 'USD' })}
+        </div>
+      )}
+      {props.data.isActive !== null && <div>{props.data.isActive ? 'is on sale' : 'sold'}</div>}
+      {props.data.about && <div className="features">features: {props.data.about}</div>}
+      {props.data.date && <div className="">ad publication date: {props.data.date}</div>}
     </div>
   );
 };

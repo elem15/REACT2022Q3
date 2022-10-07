@@ -11,7 +11,7 @@ export interface IProps {
   houseType: string;
   email: string;
   phone: string;
-  dateOfPublish: string;
+  date: string;
   address: string;
   about: string;
 }

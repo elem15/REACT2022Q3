@@ -1,12 +1,14 @@
-import React, { FormEvent } from 'react';
-import { IProps } from 'components/Cards/Cards';
+import React, { ChangeEvent, FormEvent } from 'react';
 import './Form.css';
 
 interface IFormComponentProps {
   handleOnSubmit: (e: FormEvent) => void;
-  addressInput: React.RefObject<HTMLInputElement>;
-  fileInput: React.RefObject<HTMLInputElement>;
-  dateInput: React.RefObject<HTMLInputElement>;
+  handleOnChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  address: React.RefObject<HTMLInputElement>;
+  file: React.RefObject<HTMLInputElement>;
+  date: React.RefObject<HTMLInputElement>;
+  addressError: boolean;
+  dateError: boolean;
 }
 const FormComponent = (props: IFormComponentProps) => {
   return (
@@ -17,18 +19,22 @@ const FormComponent = (props: IFormComponentProps) => {
           name="address"
           placeholder="address"
           defaultValue=""
-          ref={props.addressInput}
+          ref={props.address}
+          onChange={props.handleOnChange}
         />
+        {props.addressError && <span>Address is incorrect</span>}
         <br />
         <input
           type="date"
           name="date"
           placeholder="enter data"
           defaultValue=""
-          ref={props.dateInput}
+          ref={props.date}
+          onChange={props.handleOnChange}
         />
+        {props.dateError && <span>Date is incorrect</span>}
         <br />
-        <input type="file" accept="image/*" ref={props.fileInput} />
+        <input type="file" accept="image/*" ref={props.file} />
         <br />
         <button type="submit">send</button>
       </form>
