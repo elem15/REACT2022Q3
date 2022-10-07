@@ -6,6 +6,7 @@ export interface IProps {
   id: string;
   index: number;
   isActive: boolean | null;
+  isUrgent: boolean;
   price: number;
   picture: string;
   houseType: string;

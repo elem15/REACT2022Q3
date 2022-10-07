@@ -1,3 +1,4 @@
+import { ABOUT, FORM } from 'App';
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import './Layout.css';
@@ -10,10 +11,10 @@ const Layout = () => {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/form">Form</Link>
+            <Link to={FORM}>Form</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+            <Link to={ABOUT}>About</Link>
           </li>
         </ul>
       </nav>

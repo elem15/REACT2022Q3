@@ -40,7 +40,8 @@ class FormContainer extends Component<IFormProps> {
   state: IProps & IValidateState = {
     id: '',
     index: 0,
-    isActive: null,
+    isActive: true,
+    isUrgent: true,
     price: 0,
     picture: '',
     houseType: '',
@@ -68,7 +69,11 @@ class FormContainer extends Component<IFormProps> {
   file = createRef<HTMLInputElement>();
   date = createRef<HTMLInputElement>();
   address = createRef<HTMLInputElement>();
-  handleOnChange = async (e: ChangeEvent<HTMLInputElement>) => {
+  houseType = createRef<HTMLSelectElement>();
+  isActive = createRef<HTMLInputElement>();
+  isUrgent = createRef<HTMLInputElement>();
+
+  handleOnChange = async (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     await this.setState((prevState: Readonly<IValidateState>) => {
       const validate = prevState.validate;
       return {
@@ -77,13 +82,12 @@ class FormContainer extends Component<IFormProps> {
     });
     const arr = await Object.values(this.state.validate);
     if (!arr.includes(false)) {
-      console.log(true);
       await this.setState({ formIsActive: true });
     }
   };
+
   handleOnSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     const address = this.address.current?.value;
     if (!addressValidate(address)) {
       await this.setState((prevState: Readonly<IValidateState>) => {
@@ -104,10 +108,26 @@ class FormContainer extends Component<IFormProps> {
         };
       });
     }
+    const houseType = this.houseType.current?.value;
+    if (!addressValidate(houseType)) {
+      await this.setState((prevState: Readonly<IValidateState>) => {
+        const validate = prevState.validate;
+        return {
+          formIsActive: false,
+          validate: { ...validate, houseType: false },
+        };
+      });
+    }
+
     const arr = await Object.values(this.state.validate);
     if (arr.includes(false)) return;
+    const isActive = !this.isActive.current?.checked;
+    const isUrgent = this.isUrgent.current?.checked;
     await this.setState({
       id: uuidv4(),
+      houseType,
+      isUrgent,
+      isActive,
       address,
       date,
     });
@@ -131,7 +151,11 @@ class FormContainer extends Component<IFormProps> {
         address={this.address}
         addressError={!this.state.validate.address}
         dateError={!this.state.validate.date}
+        houseTypeError={!this.state.validate.houseType}
         formIsActive={this.state.formIsActive}
+        houseType={this.houseType}
+        isActive={this.isActive}
+        isUrgent={this.isUrgent}
         date={this.date}
         file={this.file}
       />

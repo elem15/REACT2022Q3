@@ -15,7 +15,6 @@ class Main extends Component {
   };
   handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Search value: ', this.state.searchValue);
     this.setState({
       searchValue: '',
     });
