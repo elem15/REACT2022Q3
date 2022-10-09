@@ -1,6 +1,6 @@
 import React from 'react';
 import { IProps } from './Cards';
-import house from '../../MockData/house.png';
+import house from '../../mockData/house.png';
 
 interface CardProps {
   data: IProps;

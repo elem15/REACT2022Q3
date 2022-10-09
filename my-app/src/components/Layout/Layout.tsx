@@ -1,4 +1,4 @@
-import { ABOUT, FORM } from 'App';
+import { routes } from 'helpers/constants/routes';
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import './Layout.css';
@@ -8,13 +8,13 @@ const Layout = () => {
       <nav>
         <ul className="nav-list">
           <li>
-            <Link to="/">Home</Link>
+            <Link to={routes.BASE_URL}>Home</Link>
           </li>
           <li>
-            <Link to={FORM}>Form</Link>
+            <Link to={routes.FORM}>Form</Link>
           </li>
           <li>
-            <Link to={ABOUT}>About</Link>
+            <Link to={routes.ABOUT}>About</Link>
           </li>
         </ul>
       </nav>

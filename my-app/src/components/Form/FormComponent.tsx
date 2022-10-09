@@ -53,8 +53,9 @@ const FormComponent = (props: IFormComponentProps) => {
           placeholder="select house type"
           ref={props.houseType}
           onChange={props.handleOnChange}
+          defaultValue="default"
         >
-          <option value="">select house type</option>
+          <option value="default">select house type</option>
           <option value="detached house">detached house</option>
           <option value="townhouse">townhouse</option>
           <option value="apartment">apartment</option>

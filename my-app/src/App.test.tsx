@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
-import data from './MockData/data';
+import data from './mockData/data';
 
 test('renders main page with navigation link', () => {
   render(<App />);
