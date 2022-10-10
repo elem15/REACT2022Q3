@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FormPageContainer from './FormContainer-1';
+import FormPageContainer from './FormContainer';
 
-describe('render form test', () => {
+describe('render form', () => {
   it('form submit', () => {
     render(<FormPageContainer />);
     const inputEl = screen.getByPlaceholderText('address');
@@ -27,7 +27,6 @@ describe('render form test', () => {
     screen.getAllByText(/townhouse/i);
     screen.getAllByText(/sold/i);
     screen.getAllByText(/emergency/i);
-    screen.debug();
   });
   it('multi cards render', () => {
     render(<FormPageContainer />);

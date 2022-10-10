@@ -13,6 +13,7 @@
   background-color: darkgray;
   border-radius: 5px;
   padding: 20px 20px;
+  position: relative;
 }
 
 .card-img {
@@ -24,4 +25,12 @@
   overflow: clip;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.fire {
+  width: 50px;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: none;
 }
