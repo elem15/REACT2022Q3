@@ -1,6 +1,6 @@
 import React, { FormEvent, Component, createRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import Cards, { IData, IProps } from 'components/Cards/Cards';
+import { IData, IProps } from 'components/Cards/Cards';
 import './Form.css';
 import FormComponent from './FormComponent';
 
