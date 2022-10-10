@@ -27,7 +27,7 @@ test('renders main page with one cards', () => {
 test('renders main page with cards list', () => {
   render(<App />);
   data.map((item) => {
-    const address = screen.getByText(item.address);
+    const address = screen.getByText(new RegExp(item.address, 'i'));
     expect(address).toBeInTheDocument();
   });
 });
