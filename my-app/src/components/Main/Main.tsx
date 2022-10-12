@@ -32,21 +32,21 @@ class Main extends Component {
   };
   handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    this.handleDataLoad();
+    this.handleDataLoad(this.state.searchValue);
     this.setState({
       searchValue: '',
     });
   };
-  handleDataLoad = async () => {
-    // const response = (await fetch(routes.RINGS_BASE_URL + routes.BOOK)) as Response;
-    // const data = await response.json();
-    // console.log(data);
-    const response = (await fetch(routes.RINGS_BASE_URL + routes.MOVIE, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
-      },
-    })) as Response;
+  handleDataLoad = async (name: string) => {
+    const response = (await fetch(
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(name, 'i')}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
+        },
+      }
+    )) as Response;
     const data = await response.json();
     console.log(data);
   };
