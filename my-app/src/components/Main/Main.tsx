@@ -38,7 +38,15 @@ class Main extends Component {
     });
   };
   handleDataLoad = async () => {
-    const response = (await fetch(routes.RINGS_BASE_URL + routes.BOOK)) as Response;
+    // const response = (await fetch(routes.RINGS_BASE_URL + routes.BOOK)) as Response;
+    // const data = await response.json();
+    // console.log(data);
+    const response = (await fetch(routes.RINGS_BASE_URL + routes.MOVIE, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
+      },
+    })) as Response;
     const data = await response.json();
     console.log(data);
   };

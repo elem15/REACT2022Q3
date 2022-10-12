@@ -6,4 +6,5 @@ export enum routes {
   NOT_DEFINED = '*',
   RINGS_BASE_URL = 'https://the-one-api.dev/v2',
   BOOK = '/book',
+  MOVIE = '/movie',
 }
