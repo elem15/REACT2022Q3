@@ -20,12 +20,12 @@ class Search extends Component<IProps> {
             className="search-items"
             name="search"
             type="search"
-            placeholder="search"
+            placeholder="character's name"
             value={props.searchValue}
             onChange={props.handleOnChange}
           />
           <br />
-          <button className="search-items search-button">search</button>
+          <button className="search-items search-button">search by name</button>
         </form>
       </section>
     );
