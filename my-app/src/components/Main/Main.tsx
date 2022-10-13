@@ -4,14 +4,24 @@ import { routes } from 'helpers/constants/routes';
 import React, { Component, FormEvent } from 'react';
 import data from '../../mockData/data';
 
-interface Docs {
-  docs: {
-    _id: string;
-    name: string;
-  }[];
+export interface Character {
+  _id: string;
+  name: string;
+  birth: string;
+  death: string;
+  gender: string;
+  hair: string;
+  height: string;
+  race: string;
+  realm: string;
+  spouse: string;
+  wikiUrl: string;
+}
+
+export interface Docs {
+  docs: Character[];
   total: number;
   limit: number;
-  offset: number;
   page: number;
   pages: number;
 }
@@ -19,10 +29,10 @@ interface Docs {
 class Main extends Component {
   state = {
     searchValue: localStorage.getItem('searchValue') ?? '',
-    docs: {
-      // eslint-disable-next-line prettier/prettier
-      // "docs":  [{ "_id": "5cf5805fb53e011a64671582", "name": "The Fellowship Of The Ring" }, { "_id": "5cf58077b53e011a64671583", "name": "The Two Towers" }, { "_id": "5cf58080b53e011a64671584", "name": "The Return Of The King" }], "total": 3, "limit": 1000, "offset": 0, "page": 1, "pages": 1
-    },
+    docs: {} as Docs,
+  };
+  componentDidMount = async () => {
+    await this.handleDataLoad(1);
   };
   handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
@@ -32,12 +42,26 @@ class Main extends Component {
   };
   handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    this.handleDataLoad(this.state.searchValue);
+    this.handleDataSearch(this.state.searchValue);
     this.setState({
       searchValue: '',
     });
   };
-  handleDataLoad = async (name: string) => {
+  handleDataLoad = async (page: number) => {
+    const response = (await fetch(
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
+        },
+      }
+    )) as Response;
+    const data = await response.json();
+    console.log(data);
+  };
+  handleDataSearch = async (name: string) => {
+    if (name.length < 3) return;
     const response = (await fetch(
       `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(name, 'i')}`,
       {
