@@ -1,0 +1,36 @@
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  width: 75vw;
+  flex-grow: 1;
+  gap: 1em 1em;
+  padding: 1em 1em;
+}
+
+.card {
+  width: 150px;
+  background-color: darkgray;
+  border-radius: 5px;
+  padding: 20px 20px;
+  position: relative;
+}
+
+.card-img {
+  width: 300px;
+}
+
+.features {
+  max-height: 20px;
+  overflow: clip;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.fire {
+  width: 50px;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background-color: none;
+}

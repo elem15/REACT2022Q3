@@ -1,10 +1,9 @@
-import Cards from 'components/Cards/Cards';
+import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { routes } from 'helpers/constants/routes';
 import React, { Component, FormEvent } from 'react';
-import data from '../../mockData/data';
 
-export interface Character {
+export interface ICharacter {
   _id: string;
   name: string;
   birth: string;
@@ -18,18 +17,21 @@ export interface Character {
   wikiUrl: string;
 }
 
-export interface Docs {
-  docs: Character[];
-  total: number;
-  limit: number;
-  page: number;
-  pages: number;
+export interface IDocs {
+  data: {
+    docs: ICharacter[];
+    total: number;
+    limit: number;
+    page: number;
+    pages: number;
+  };
 }
 
 class Main extends Component {
   state = {
     searchValue: localStorage.getItem('searchValue') ?? '',
-    docs: {} as Docs,
+    docs: [],
+    data: {} as IDocs,
   };
   componentDidMount = async () => {
     await this.handleDataLoad(1);
@@ -58,7 +60,7 @@ class Main extends Component {
       }
     )) as Response;
     const data = await response.json();
-    console.log(data);
+    this.setState({ docs: data.docs });
   };
   handleDataSearch = async (name: string) => {
     if (name.length < 3) return;
@@ -72,7 +74,7 @@ class Main extends Component {
       }
     )) as Response;
     const data = await response.json();
-    console.log(data);
+    this.setState({ docs: data.docs });
   };
   render() {
     return (
@@ -82,7 +84,7 @@ class Main extends Component {
           handleOnChange={this.handleOnChange}
           handleOnSubmit={this.handleOnSubmit}
         />
-        <Cards data={data} />
+        <Characters docs={this.state.docs} />
       </div>
     );
   }
