@@ -1,10 +1,11 @@
-import { ErrorResponse } from '@remix-run/router';
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
-import React, { Component, FormEvent } from 'react';
+import axios from 'axios';
+import React, { FormEvent, PureComponent } from 'react';
 import './Main.css';
+import Modal from 'components/Characters/Modal';
 
 export interface ICharacter {
   _id: string;
@@ -27,9 +28,22 @@ export interface IDocs {
   page: number;
   pages: number;
 }
+interface IProps {
+  str: string;
+}
+interface IState {
+  loading: boolean;
+  error: boolean;
+  searchValue: string;
+  docs: never[];
+  page: number;
+  pages: number;
+  mode: Mode;
+  modalMode: boolean;
+}
 
-class Main extends Component {
-  state = {
+class Main extends PureComponent {
+  state: IState = {
     loading: true,
     error: false,
     searchValue: localStorage.getItem('searchValue') ?? '',
@@ -37,9 +51,15 @@ class Main extends Component {
     page: 1,
     pages: 0,
     mode: Mode.LIST,
+    modalMode: true,
   };
-  componentDidMount = async () => {
-    await this.handleDataLoad(this.state.page);
+  componentDidMount = () => {
+    this.handleDataLoad(this.state.page);
+  };
+  componentDidUpdate = (prevProps: IProps, prevState: IState) => {
+    if (this.state.page !== prevState.page) {
+      this.handleDataLoad(this.state.page);
+    }
   };
   handleOnChange = (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
@@ -57,7 +77,7 @@ class Main extends Component {
   handleDataLoad = async (page: number) => {
     this.setState({ loading: true });
     try {
-      const response = (await fetch(
+      const response = await axios.get<IDocs>(
         `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}`,
         {
           headers: {
@@ -65,42 +85,38 @@ class Main extends Component {
             Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
           },
         }
-      )) as Response;
-      const data = (await response.json()) as IDocs;
+      );
+      const { data } = response;
       this.setState({ docs: data.docs, loading: false, pages: data.pages, error: false });
     } catch (e) {
-      this.setState({ error: true });
+      this.setState({ error: true, loading: false });
       console.log(e);
     }
   };
-  handleDataNext = async () => {
+  handleDataNext = () => {
     if (this.state.page < this.state.pages) {
-      await this.setState((prevState: Readonly<IDocs>) => {
+      this.setState((prevState: Readonly<IDocs>) => {
         let { page } = prevState;
         return { page: (page += 1) };
       });
-      await this.handleDataLoad(this.state.page);
     }
   };
-  handleDataPrev = async () => {
+  handleDataPrev = () => {
     if (this.state.page > 1) {
-      await this.setState((prevState: Readonly<IDocs>) => {
+      this.setState((prevState: Readonly<IDocs>) => {
         let { page } = prevState;
         return { page: (page -= 1) };
       });
-      await this.handleDataLoad(this.state.page);
     }
   };
-  handleDataEnd = async () => {
+  handleDataEnd = () => {
     if (this.state.page < this.state.pages) {
-      await this.setState({ page: this.state.pages });
-      await this.handleDataLoad(this.state.page);
+      this.setState({ page: this.state.pages });
     }
   };
-  handleDataBegin = async () => {
+  handleDataBegin = () => {
     if (this.state.page > 1) {
-      await this.setState({ page: 1 });
-      await this.handleDataLoad(this.state.page);
+      this.setState({ page: 1 });
     }
   };
   handleToListMode = async () => {
@@ -119,7 +135,7 @@ class Main extends Component {
     }
     try {
       this.setState({ loading: true });
-      const response = (await fetch(
+      const response = await axios.get<IDocs>(
         `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(name, 'i')}`,
         {
           headers: {
@@ -127,18 +143,20 @@ class Main extends Component {
             Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
           },
         }
-      )) as Response;
-      const data = await response.json();
+      );
       this.setState({
-        docs: data.docs,
+        docs: response.data.docs,
         loading: false,
         error: false,
         mode: Mode.SEARCH,
       });
     } catch (e) {
-      this.setState({ error: true });
+      this.setState({ error: true, loading: false });
       console.log(e);
     }
+  };
+  handleRemoveModal = () => {
+    this.setState({ modalMode: false });
   };
   render() {
     return (
@@ -152,7 +170,7 @@ class Main extends Component {
         {this.state.loading ? (
           <div>loading</div>
         ) : this.state.error ? (
-          <div>error</div>
+          <div>same network error</div>
         ) : (
           <Characters
             docs={this.state.docs}
@@ -165,6 +183,7 @@ class Main extends Component {
             handleToListMode={this.handleToListMode}
           />
         )}
+        {this.state.modalMode && <Modal handleRemoveModal={this.handleRemoveModal} />}
       </div>
     );
   }
