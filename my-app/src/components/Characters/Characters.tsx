@@ -13,6 +13,7 @@ interface IProps {
   handleDataEnd: () => void;
   handleDataBegin: () => void;
   handleToListMode: () => void;
+  handleCreateModal: (id: string) => void;
 }
 const Characters = (props: IProps) => {
   return (
@@ -20,7 +21,14 @@ const Characters = (props: IProps) => {
       {props.docs.length ? (
         <div className="cards-character">
           {props.docs.map((value) => (
-            <Character key={value._id} name={value.name} race={value.race} birth={value.birth} />
+            <Character
+              key={value._id}
+              id={value._id}
+              name={value.name}
+              race={value.race}
+              birth={value.birth}
+              handleCreateModal={props.handleCreateModal}
+            />
           ))}
         </div>
       ) : (

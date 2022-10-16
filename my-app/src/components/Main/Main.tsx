@@ -35,11 +35,12 @@ interface IState {
   loading: boolean;
   error: boolean;
   searchValue: string;
-  docs: never[];
+  docs: ICharacter[];
   page: number;
   pages: number;
   mode: Mode;
   modalMode: boolean;
+  modalDoc: ICharacter | null;
 }
 
 class Main extends PureComponent {
@@ -51,7 +52,8 @@ class Main extends PureComponent {
     page: 1,
     pages: 0,
     mode: Mode.LIST,
-    modalMode: true,
+    modalMode: false,
+    modalDoc: null,
   };
   componentDidMount = () => {
     this.handleDataLoad(this.state.page);
@@ -158,6 +160,16 @@ class Main extends PureComponent {
   handleRemoveModal = () => {
     this.setState({ modalMode: false });
   };
+  handleCreateModal = (id: string) => {
+    const modalDoc = this.findModalData(id);
+    this.setState({
+      modalMode: true,
+      modalDoc,
+    });
+  };
+  findModalData = (id: string) => {
+    return this.state.docs.find((item) => item._id === id);
+  };
   render() {
     return (
       <div className="App">
@@ -181,9 +193,12 @@ class Main extends PureComponent {
             handleDataEnd={this.handleDataEnd}
             handleDataBegin={this.handleDataBegin}
             handleToListMode={this.handleToListMode}
+            handleCreateModal={this.handleCreateModal}
           />
         )}
-        {this.state.modalMode && <Modal handleRemoveModal={this.handleRemoveModal} />}
+        {this.state.modalMode && (
+          <Modal handleRemoveModal={this.handleRemoveModal} modalDoc={this.state.modalDoc} />
+        )}
       </div>
     );
   }
