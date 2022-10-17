@@ -3,9 +3,10 @@ import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
 import axios from 'axios';
-import React, { FormEvent, PureComponent } from 'react';
+import React, { FormEvent, Component } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
+import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
 
 export interface ICharacter {
   _id: string;
@@ -28,9 +29,6 @@ export interface IDocs {
   page: number;
   pages: number;
 }
-interface IProps {
-  str: string;
-}
 interface IState {
   loading: boolean;
   error: boolean;
@@ -42,8 +40,12 @@ interface IState {
   modalMode: boolean;
   modalDoc: ICharacter | null;
 }
+interface IProps {
+  searchCharacters: (name: string) => Promise<IDataSearch>;
+  loadCharacters: (page: number) => Promise<IDataLoad>;
+}
 
-class Main extends PureComponent {
+class Main extends Component<IProps> {
   state: IState = {
     loading: true,
     error: false,
@@ -78,22 +80,7 @@ class Main extends PureComponent {
   };
   handleDataLoad = async (page: number) => {
     this.setState({ loading: true });
-    try {
-      const response = await axios.get<IDocs>(
-        `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
-          },
-        }
-      );
-      const { data } = response;
-      this.setState({ docs: data.docs, loading: false, pages: data.pages, error: false });
-    } catch (e) {
-      this.setState({ error: true, loading: false });
-      console.log(e);
-    }
+    this.setState(await this.props.loadCharacters(page));
   };
   handleDataNext = () => {
     if (this.state.page < this.state.pages) {
@@ -126,36 +113,8 @@ class Main extends PureComponent {
     await this.handleDataLoad(this.state.page);
   };
   handleDataSearch = async (name: string) => {
-    if (name.length < 3) {
-      this.setState({
-        docs: [],
-        loading: false,
-        error: false,
-        mode: Mode.SEARCH,
-      });
-      return;
-    }
-    try {
-      this.setState({ loading: true });
-      const response = await axios.get<IDocs>(
-        `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(name, 'i')}`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
-          },
-        }
-      );
-      this.setState({
-        docs: response.data.docs,
-        loading: false,
-        error: false,
-        mode: Mode.SEARCH,
-      });
-    } catch (e) {
-      this.setState({ error: true, loading: false });
-      console.log(e);
-    }
+    this.setState({ loading: true });
+    this.setState(await this.props.searchCharacters(name));
   };
   handleRemoveModal = () => {
     this.setState({ modalMode: false });
