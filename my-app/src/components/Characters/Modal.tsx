@@ -1,6 +1,5 @@
 import { ICharacter } from 'components/Main/Main';
 import React, { MouseEvent } from 'react';
-import { Link } from 'react-router-dom';
 
 interface IProps {
   handleRemoveModal: () => void;
@@ -10,7 +9,6 @@ const Modal = (props: IProps) => {
   const stopPropagation = (e: MouseEvent<HTMLElement>) => {
     e.stopPropagation();
   };
-  console.log(props.modalDoc);
   return (
     <div className="modal" onClick={props.handleRemoveModal}>
       <div className="modal-window" onClick={stopPropagation}>

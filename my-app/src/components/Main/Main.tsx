@@ -1,8 +1,6 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import { routes } from 'helpers/constants/routes';
-import axios from 'axios';
 import React, { FormEvent, Component } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';

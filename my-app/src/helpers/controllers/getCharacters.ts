@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { ICharacter, IDocs } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
@@ -29,7 +29,8 @@ export const loadCharacters = async (page: number) => {
     const { data } = response;
     return { docs: data.docs, loading: false, pages: data.pages, error: false };
   } catch (e) {
-    console.log(e);
+    const error = e as AxiosError;
+    console.log(error.response?.data);
     return { error: true, loading: false };
   }
 };
@@ -59,7 +60,8 @@ export const searchCharacters = async (name: string) => {
       mode: Mode.SEARCH,
     };
   } catch (e) {
-    console.log(e);
+    const error = e as AxiosError;
+    console.log(error.response?.data);
     return { error: true, loading: false, docs: [], mode: Mode.SEARCH };
   }
 };
