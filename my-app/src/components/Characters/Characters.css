@@ -6,7 +6,6 @@
   gap: 1em 1em;
   padding: 1em 1em;
 }
-
 .card {
   width: 150px;
   background-color: darkgray;
@@ -14,11 +13,9 @@
   padding: 20px 20px;
   position: relative;
 }
-
 .pagination {
   text-align: center;
 }
-
 .modal {  
   position: fixed;
   top: 0;
@@ -45,4 +42,9 @@
   background-color: rgba(117, 190, 218, 0);
   border: none;
   cursor: pointer;
+}
+.nothing-message {
+  text-align: center;
+  font-size: 2em;
+  margin-bottom: 3em;
 }

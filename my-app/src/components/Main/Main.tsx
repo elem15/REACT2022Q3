@@ -35,6 +35,7 @@ interface IState {
   errorMessage: string;
   searchValue: string;
   docs: ICharacter[];
+  names: string[];
   page: number;
   pages: number;
   mode: Mode;
@@ -53,6 +54,7 @@ class Main extends Component<IProps> {
     errorMessage: '',
     searchValue: localStorage.getItem('searchValue') ?? '',
     docs: [],
+    names: [],
     page: 1,
     pages: 0,
     mode: Mode.LIST,
@@ -67,11 +69,14 @@ class Main extends Component<IProps> {
       this.handleDataLoad(this.state.page);
     }
   };
-  handleOnChange = (e: FormEvent<HTMLInputElement>) => {
+  handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     this.setState({
       searchValue: value,
     });
+    const data = await this.props.searchCharacters(value);
+    const names = data.docs.map((item) => item.name);
+    this.setState({ names });
   };
   handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -136,6 +141,7 @@ class Main extends Component<IProps> {
       <div className="App">
         <h1>The Lord of the Rings - search characters</h1>
         <Search
+          names={this.state.names}
           searchValue={this.state.searchValue}
           handleOnChange={this.handleOnChange}
           handleOnSubmit={this.handleOnSubmit}

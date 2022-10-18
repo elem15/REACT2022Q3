@@ -7,8 +7,7 @@ import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
 import FormContainer from 'components/Form/FormContainer';
 import { routes } from 'helpers/constants/routes';
-// import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
-import { searchCharacters, loadCharacters } from './mockData/mockCharactersLoad';
+import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
 
 function App() {
   return (

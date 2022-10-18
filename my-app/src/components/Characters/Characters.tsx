@@ -32,7 +32,7 @@ const Characters = (props: IProps) => {
           ))}
         </div>
       ) : (
-        <div>Nothing find</div>
+        <div className="nothing-message">Nothing find</div>
       )}
       {props.mode === Mode.LIST && (
         <div className="pagination">
