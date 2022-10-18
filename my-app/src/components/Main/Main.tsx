@@ -35,7 +35,7 @@ interface IState {
   errorMessage: string;
   searchValue: string;
   docs: ICharacter[];
-  names: string[];
+  names: { name: string; id: string }[];
   page: number;
   pages: number;
   mode: Mode;
@@ -75,7 +75,7 @@ class Main extends Component<IProps> {
       searchValue: value,
     });
     const data = await this.props.searchCharacters(value);
-    const names = data.docs.map((item) => item.name);
+    const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
     this.setState({ names });
   };
   handleOnSubmit = (e: FormEvent) => {

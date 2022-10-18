@@ -49,9 +49,11 @@ export const searchCharacters = async (name: string) => {
       mode: Mode.SEARCH,
     };
   }
+  const bracketIndex = name.indexOf('(');
+  const correctName = bracketIndex > -1 ? name.slice(bracketIndex) : name;
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(name, 'i')}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(correctName, 'i')}`,
       {
         headers: {
           'Content-Type': 'application/json',

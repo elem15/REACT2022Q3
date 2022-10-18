@@ -1,7 +1,7 @@
 import React, { Component, FormEvent } from 'react';
 import './Search.css';
 interface IProps {
-  names: string[];
+  names: { name: string; id: string }[];
   searchValue: string;
   handleOnChange: (e: FormEvent<HTMLInputElement>) => void;
   handleOnSubmit: (e: FormEvent) => void;
@@ -28,7 +28,7 @@ class Search extends Component<IProps> {
             onChange={props.handleOnChange}
           />
           <datalist id="search">
-            {props.names.map((name, idx) => idx < 10 && <option key={name} value={name}></option>)}
+            {props.names.map(({ name, id }, idx) => idx < 10 && <option key={id} value={name} />)}
           </datalist>
           <br />
           <button className="search-items search-button">search by name</button>
