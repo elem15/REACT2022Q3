@@ -7,13 +7,19 @@ export interface IDataSearch {
   docs: ICharacter[];
   loading: boolean;
   error: boolean;
+  errorMessage?: string;
   mode: Mode;
 }
 export interface IDataLoad {
   docs?: ICharacter[];
+  errorMessage?: string;
   loading: boolean;
   error: boolean;
   pages?: number;
+}
+export interface IErrorData {
+  message: string;
+  success: boolean;
 }
 export const loadCharacters = async (page: number) => {
   try {
@@ -27,11 +33,11 @@ export const loadCharacters = async (page: number) => {
       }
     );
     const { data } = response;
-    return { docs: data.docs, loading: false, pages: data.pages, error: false };
+    return { docs: data.docs, loading: false, pages: data.pages, error: false, mode: Mode.LIST };
   } catch (e) {
     const error = e as AxiosError;
-    console.log(error.response?.data);
-    return { error: true, loading: false };
+    const data = error.response?.data as IErrorData;
+    return { error: true, loading: false, docs: [], mode: Mode.SEARCH, errorMessage: data.message };
   }
 };
 export const searchCharacters = async (name: string) => {
@@ -58,10 +64,11 @@ export const searchCharacters = async (name: string) => {
       loading: false,
       error: false,
       mode: Mode.SEARCH,
+      errorMessage: '',
     };
   } catch (e) {
     const error = e as AxiosError;
-    console.log(error.response?.data);
-    return { error: true, loading: false, docs: [], mode: Mode.SEARCH };
+    const data = error.response?.data as IErrorData;
+    return { error: true, loading: false, docs: [], mode: Mode.SEARCH, errorMessage: data.message };
   }
 };

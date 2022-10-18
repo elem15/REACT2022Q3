@@ -5,6 +5,8 @@ import React, { FormEvent, Component } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
+import Preloader from 'components/Preloader/Preloader';
+import NetworkError from 'components/NetworkError/NetworkError';
 
 export interface ICharacter {
   _id: string;
@@ -30,6 +32,7 @@ export interface IDocs {
 interface IState {
   loading: boolean;
   error: boolean;
+  errorMessage: string;
   searchValue: string;
   docs: ICharacter[];
   page: number;
@@ -47,6 +50,7 @@ class Main extends Component<IProps> {
   state: IState = {
     loading: true,
     error: false,
+    errorMessage: '',
     searchValue: localStorage.getItem('searchValue') ?? '',
     docs: [],
     page: 1,
@@ -137,9 +141,11 @@ class Main extends Component<IProps> {
           handleOnSubmit={this.handleOnSubmit}
         />
         {this.state.loading ? (
-          <div>loading</div>
+          <div className="preloader">
+            <Preloader />
+          </div>
         ) : this.state.error ? (
-          <div>same network error</div>
+          <NetworkError message={this.state.errorMessage} />
         ) : (
           <Characters
             docs={this.state.docs}

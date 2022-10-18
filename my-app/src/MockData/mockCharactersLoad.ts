@@ -1,22 +1,18 @@
-import { ICharacter } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { docs } from './mockCharacter';
 
-export interface IDataSearch {
-  docs: ICharacter[];
-  loading: boolean;
-  error: boolean;
-  mode: Mode;
-}
-export interface IDataLoad {
-  docs?: ICharacter[];
-  loading: boolean;
-  error: boolean;
-  pages?: number;
-}
 export const loadCharacters = async (page: number) => {
-  const response = docs.filter((item, idx) => idx < 20);
-  return { docs: response, loading: false, pages: 20, error: false };
+  const pages = Math.floor(docs.length / 20);
+  const currentPageEnd = page * 20;
+  const currentPageStart = currentPageEnd - 20;
+  const response = docs.filter((item, idx) => idx >= currentPageStart && idx < currentPageEnd);
+  return {
+    docs: response,
+    loading: false,
+    pages,
+    error: false,
+    errorMessage: '',
+  };
 };
 export const searchCharacters = async (name: string) => {
   if (name.length < 3) {
@@ -25,6 +21,7 @@ export const searchCharacters = async (name: string) => {
       loading: false,
       error: false,
       mode: Mode.SEARCH,
+      errorMessage: '',
     };
   }
   const response = docs.filter((item) => item.name.match(new RegExp(name, 'i')));
@@ -33,5 +30,6 @@ export const searchCharacters = async (name: string) => {
     loading: false,
     error: false,
     mode: Mode.SEARCH,
+    errorMessage: '',
   };
 };

@@ -6,12 +6,24 @@ import userEvent from '@testing-library/user-event';
 
 test('renders main page with characters list', async () => {
   render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
-  screen.getAllByText(/loading/i);
+  screen.findByPlaceholderText(/preloader/i);
   await new Promise(function (res) {
     setTimeout(() => res('done'), 100);
   });
   screen.getAllByText(/elf/i);
   screen.getAllByText(/Amrothos/i);
+});
+test('pagination main page with characters list', async () => {
+  render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
+  await new Promise(function (res) {
+    setTimeout(() => res('done'), 100);
+  });
+  const nextButton = screen.getByText('>');
+  userEvent.click(nextButton);
+  await new Promise(function (res) {
+    setTimeout(() => res('done'), 100);
+  });
+  screen.getByText(/Aragorn/i);
 });
 test('render modal window', async () => {
   render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
