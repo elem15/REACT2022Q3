@@ -2,22 +2,22 @@ import React from 'react';
 import Card from './Card';
 import './Cards.css';
 
-export interface IProps {
+export interface ICard {
   id: string;
-  index: number;
+  // index: number;
   isActive: boolean | null;
   isUrgent: boolean;
   price: number;
   picture: string;
   houseType: string;
-  email: string;
-  phone: string;
+  // email: string;
+  // phone: string;
   date: string;
   address: string;
   about: string;
 }
 export interface IData {
-  data: IProps[];
+  data: ICard[];
 }
 
 const Cards = (props: IData) => {

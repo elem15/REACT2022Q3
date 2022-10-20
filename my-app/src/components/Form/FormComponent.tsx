@@ -1,4 +1,4 @@
-import Cards, { IProps } from 'components/Cards/Cards';
+import Cards, { ICard } from 'components/Cards/Cards';
 import React, { ChangeEvent, FormEvent } from 'react';
 import './Form.css';
 
@@ -15,7 +15,7 @@ interface IFormComponentProps {
   dateValidate: boolean;
   houseTypeValidate: boolean;
   formIsActive: boolean;
-  data: IProps[];
+  data: ICard[];
 }
 const FormComponent = (props: IFormComponentProps) => {
   return (

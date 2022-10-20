@@ -1,10 +1,10 @@
 import React from 'react';
-import { IProps } from './Cards';
+import { ICard } from './Cards';
 import house from '../../media/house.png';
 import fire from '../../media/fire.svg';
 
 interface CardProps {
-  data: IProps;
+  data: ICard;
 }
 const Card = (props: CardProps) => {
   return (
