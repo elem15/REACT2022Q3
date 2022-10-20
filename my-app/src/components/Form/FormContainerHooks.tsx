@@ -66,6 +66,7 @@ const FormPageContainer = () => {
   const [data, setData] = useState(initialData);
   const fileRef = useRef<HTMLInputElement>(null);
   const dateRef = useRef<HTMLInputElement>(null);
+  const priceRef = useRef<HTMLInputElement>(null);
   const addressRef = useRef<HTMLInputElement>(null);
   const houseTypeRef = useRef<HTMLSelectElement>(null);
   const isActiveRef = useRef<HTMLInputElement>(null);
@@ -86,6 +87,7 @@ const FormPageContainer = () => {
     e.preventDefault();
     const address = addressRef.current?.value;
     const date = dateRef.current?.value;
+    const price = Number(priceRef.current?.value);
     const houseType = houseTypeRef.current?.value;
     const isActive = !isActiveRef.current?.checked;
     const isUrgent = isUrgentRef.current?.checked;
@@ -116,7 +118,7 @@ const FormPageContainer = () => {
           address,
           date,
           picture,
-          price: NaN,
+          price,
           about: '',
         } as ICard,
       ]);
@@ -138,6 +140,7 @@ const FormPageContainer = () => {
       isUrgent={isUrgentRef}
       date={dateRef}
       file={fileRef}
+      price={priceRef}
     />
   );
 };

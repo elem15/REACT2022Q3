@@ -8,6 +8,7 @@ interface IFormComponentProps {
   address: React.RefObject<HTMLInputElement>;
   file: React.RefObject<HTMLInputElement>;
   date: React.RefObject<HTMLInputElement>;
+  price: React.RefObject<HTMLInputElement>;
   isActive: React.RefObject<HTMLInputElement>;
   isUrgent: React.RefObject<HTMLInputElement>;
   houseType: React.RefObject<HTMLSelectElement>;
@@ -49,6 +50,20 @@ const FormComponent = (props: IFormComponentProps) => {
             />
             {!props.dateValidate && <span className="alert"> Date is incorrect</span>}
             <br />
+          </label>
+          <hr />
+          <label htmlFor="">
+            Price:
+            <br />
+            <input
+              min="10000"
+              type="number"
+              name="price"
+              placeholder="price"
+              defaultValue=""
+              ref={props.price}
+              onChange={props.handleOnChange}
+            />
           </label>
           <hr />
           <select

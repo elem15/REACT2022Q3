@@ -4,14 +4,11 @@ import './Cards.css';
 
 export interface ICard {
   id: string;
-  // index: number;
   isActive: boolean | null;
   isUrgent: boolean;
   price: number;
   picture: string;
   houseType: string;
-  // email: string;
-  // phone: string;
   date: string;
   address: string;
   about: string;

@@ -29,13 +29,17 @@ export interface IDocs {
   page: number;
   pages: number;
 }
+export interface IName {
+  name: string;
+  id: string;
+}
 interface IState {
   loading: boolean;
   error: boolean;
   errorMessage: string;
   searchValue: string;
   docs: ICharacter[];
-  names: { name: string; id: string }[];
+  names: IName[];
   page: number;
   pages: number;
   mode: Mode;
