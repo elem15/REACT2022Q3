@@ -7,15 +7,16 @@ export interface IDataSearch {
   docs: ICharacter[];
   loading: boolean;
   error: boolean;
-  errorMessage?: string;
+  errorMessage: string;
   mode: Mode;
 }
 export interface IDataLoad {
-  docs?: ICharacter[];
+  docs: ICharacter[];
   errorMessage?: string;
   loading: boolean;
   error: boolean;
   pages?: number;
+  mode: Mode;
 }
 export interface IErrorData {
   message: string;
@@ -37,7 +38,19 @@ export const loadCharacters = async (page: number) => {
   } catch (e) {
     const error = e as AxiosError;
     const data = error.response?.data as IErrorData;
-    return { error: true, loading: false, docs: [], mode: Mode.SEARCH, errorMessage: data.message };
+    let errorMessage;
+    if (data instanceof Object) {
+      errorMessage = data.message;
+    } else {
+      errorMessage = data;
+    }
+    return {
+      error: true,
+      loading: false,
+      docs: [],
+      mode: Mode.SEARCH,
+      errorMessage,
+    };
   }
 };
 export const searchCharacters = async (name: string) => {
@@ -47,6 +60,7 @@ export const searchCharacters = async (name: string) => {
       loading: false,
       error: false,
       mode: Mode.SEARCH,
+      errorMessage: '',
     };
   }
   const bracketIndex = name.indexOf('(');

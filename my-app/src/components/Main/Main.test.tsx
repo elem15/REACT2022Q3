@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Main from './Main';
+import Main from './MainHooks';
 import { searchCharacters, loadCharacters } from '../../mockData/mockCharactersLoad';
 import userEvent from '@testing-library/user-event';
 
@@ -16,8 +16,9 @@ test('renders main page with characters list', async () => {
 test('pagination main page with characters list', async () => {
   render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
   await new Promise(function (res) {
-    setTimeout(() => res('done'), 100);
+    setTimeout(() => res('done'), 1000);
   });
+  screen.debug();
   const nextButton = screen.getByText('>');
   userEvent.click(nextButton);
   await new Promise(function (res) {

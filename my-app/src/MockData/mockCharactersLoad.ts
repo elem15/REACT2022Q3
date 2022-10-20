@@ -12,6 +12,7 @@ export const loadCharacters = async (page: number) => {
     pages,
     error: false,
     errorMessage: '',
+    mode: Mode.LIST,
   };
 };
 export const searchCharacters = async (name: string) => {

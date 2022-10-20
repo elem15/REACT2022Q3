@@ -2,7 +2,7 @@ import React from 'react';
 import './NetworkError.css';
 
 interface IProps {
-  message: string;
+  message?: string;
 }
 const NetworkError = (props: IProps) => {
   return (
