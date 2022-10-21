@@ -35,6 +35,13 @@ describe('render form', () => {
     screen.getAllByText(/sold/i);
     screen.getAllByText(/emergency/i);
   });
+  it('download picture', async () => {
+    render(<FormPageContainer />);
+    const file = new File(['test'], 'test.png', { type: 'image/png' });
+    const input = screen.getByPlaceholderText(/Download picture/i) as HTMLInputElement;
+    userEvent.upload(input, file);
+    expect(input.files).toHaveLength(1);
+  });
   it('multi cards render', async () => {
     render(<FormPageContainer />);
     const inputEl = screen.getByPlaceholderText('address');

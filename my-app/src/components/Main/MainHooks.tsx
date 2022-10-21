@@ -63,22 +63,46 @@ const Main = (props: IProps) => {
   const [state, setState] = useState(initialState);
   const [docs, setDocs] = useState([] as ICharacter[] | []);
   const [names, setNames] = useState([] as IName[] | []);
-  const handleDataLoad = async (page: number) => {
-    setState({ ...state, loading: true });
-    const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(page);
-    setState({
-      ...state,
-      loading,
-      pages: pages || state.pages,
-      error,
-      mode,
-      errorMessage: errorMessage || undefined,
-    });
-    setDocs(docs);
-  };
+  const { page, mode, loading, searchValue } = state;
   useEffect(() => {
-    handleDataLoad(state.page);
-  }, [state.page]);
+    if (mode === Mode.LIST) {
+      const handleDataLoad = async (page: number) => {
+        setState({ ...state, loading: true });
+        const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
+          page
+        );
+        setState({
+          ...state,
+          loading,
+          pages: pages || state.pages,
+          error,
+          mode,
+          errorMessage: errorMessage || undefined,
+        });
+        setDocs(docs);
+      };
+      handleDataLoad(page);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, mode]);
+  useEffect(() => {
+    if (mode === Mode.SEARCH && loading) {
+      const handleDataSearch = async (name: string) => {
+        const { docs, loading, error, mode, errorMessage } = await props.searchCharacters(name);
+        setState({
+          ...state,
+          loading,
+          error,
+          mode,
+          errorMessage,
+          searchValue: '',
+        });
+        setDocs(docs);
+      };
+      handleDataSearch(searchValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     setState({
@@ -91,8 +115,7 @@ const Main = (props: IProps) => {
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    handleDataSearch(state.searchValue);
-    setState({ ...state, searchValue: '' });
+    setState({ ...state, loading: true, mode: Mode.SEARCH });
   };
   const handleDataNext = () => {
     if (state.page < state.pages) {
@@ -116,20 +139,6 @@ const Main = (props: IProps) => {
   };
   const handleToListMode = async () => {
     setState({ ...state, mode: Mode.LIST });
-    await handleDataLoad(state.page);
-  };
-  const handleDataSearch = async (name: string) => {
-    setState({ ...state, loading: true });
-    const { docs, loading, error, mode, errorMessage } = await props.searchCharacters(name);
-    setState({
-      ...state,
-      loading,
-      error,
-      mode,
-      errorMessage,
-      searchValue: '',
-    });
-    setDocs(docs);
   };
   const handleRemoveModal = () => {
     setState({ ...state, modalMode: false, modalDoc: null });
