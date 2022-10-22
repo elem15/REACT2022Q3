@@ -1,4 +1,4 @@
-import { ICharacter } from 'components/Main/Main';
+import { ICharacter } from 'components/Main/MainHooks';
 import React, { MouseEvent } from 'react';
 
 interface IProps {

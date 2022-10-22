@@ -1,4 +1,4 @@
-import { IName } from 'components/Main/Main';
+import { IName } from 'components/Main/MainHooks';
 import React, { FormEvent, useEffect } from 'react';
 import './Search.css';
 interface IProps {
