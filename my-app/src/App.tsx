@@ -5,7 +5,7 @@ import Main from 'components/Main/MainHooks';
 import Layout from 'components/Layout/Layout';
 import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
-import FormContainer from 'components/Form/FormContainerReactForm';
+import FormContainer from 'components/Form/FormContainerAppState';
 import { routes } from 'helpers/constants/routes';
 import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
 

@@ -3,7 +3,7 @@ import React from 'react';
 import { UseFormHandleSubmit } from 'react-hook-form/dist/types/form';
 import { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form/dist/types';
 import './Form.css';
-import { IForm } from './FormContainerReactForm';
+import { IForm } from './FormContainerAppState';
 
 interface IFormComponentProps {
   handleSubmit: UseFormHandleSubmit<FieldValues>;

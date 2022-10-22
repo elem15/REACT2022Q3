@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FormPageContainer from './FormContainerReactForm';
+import FormPageContainer from './FormContainerAppState';
 
 describe('render form', () => {
   it('form submit', async () => {
@@ -93,10 +93,10 @@ describe('render form', () => {
     await new Promise(function (res) {
       setTimeout(() => res('done'), 1000);
     });
-    const addressWarning = screen.getByText(/address must be at least 8 characters/i);
+    const addressWarning = screen.getByText(/address must be more than 8 characters/i);
     expect(addressWarning).toBeInTheDocument();
     expect(addressWarning).toHaveClass('alert');
-    expect(screen.getByText(/date field must be later than/i)).toBeInTheDocument();
+    expect(screen.getByText(/please start from 1950/i)).toBeInTheDocument();
     expect(screen.getByText(/house type is required/i)).toBeInTheDocument();
   });
 });
