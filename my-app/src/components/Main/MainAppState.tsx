@@ -1,7 +1,7 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { FormEvent, useState, useEffect } from 'react';
+import React, { FormEvent, useState, useEffect, useReducer } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
@@ -51,7 +51,7 @@ const initialState: IState = {
   loading: true,
   error: false,
   errorMessage: '',
-  searchValue: localStorage.getItem('searchValue') ?? '',
+  searchValue: '',
   page: 1,
   pages: 0,
   mode: Mode.LIST,
@@ -59,15 +59,40 @@ const initialState: IState = {
   modalDoc: null,
 };
 
+type INames = IName[] | [];
+enum CardActionKind {
+  ADD = 'ADD_NAMES',
+}
+interface IAction {
+  type: CardActionKind;
+  payload: INames;
+}
+const initialNamesState: INames = [];
+const reducer = (state: INames, action: IAction) => {
+  const { type, payload } = action;
+  switch (type) {
+    case CardActionKind.ADD:
+      return payload;
+    default:
+      return state;
+  }
+};
+
 const Main = (props: IProps) => {
   const [state, setState] = useState(initialState);
   const [docs, setDocs] = useState([] as ICharacter[] | []);
-  const [names, setNames] = useState([] as IName[] | []);
+  // const [names, setNames] = useState([] as IName[] | []);
+  const [names, dispatch] = useReducer(reducer, initialNamesState);
+
   const { page, mode, loading, searchValue } = state;
   useEffect(() => {
     if (mode === Mode.LIST) {
       const handleDataLoad = async (page: number) => {
-        setState({ ...state, loading: true });
+        setState({
+          ...state,
+          loading: true,
+          searchValue: localStorage.getItem('searchValue') ?? '',
+        });
         const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
           page
         );
@@ -77,6 +102,7 @@ const Main = (props: IProps) => {
           pages: pages || state.pages,
           error,
           mode,
+          searchValue: localStorage.getItem('searchValue') ?? '',
           errorMessage: errorMessage || undefined,
         });
         setDocs(docs);
@@ -105,13 +131,14 @@ const Main = (props: IProps) => {
   }, [loading]);
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
+    localStorage.setItem('searchValue', value);
     setState({
       ...state,
       searchValue: value,
     });
     const data = await props.searchCharacters(value);
     const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-    setNames(names);
+    dispatch({ type: CardActionKind.ADD, payload: names });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();

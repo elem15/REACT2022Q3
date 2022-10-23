@@ -1,5 +1,5 @@
 import { IName } from 'components/Main/MainHooks';
-import React, { FormEvent, useEffect } from 'react';
+import React, { FormEvent } from 'react';
 import './Search.css';
 interface IProps {
   names: IName[];
@@ -9,9 +9,6 @@ interface IProps {
 }
 
 const Search = (props: IProps) => {
-  useEffect(() => {
-    localStorage.setItem('searchValue', props.searchValue);
-  });
   return (
     <section className="search-section">
       <form className="search-form" onSubmit={props.handleOnSubmit}>

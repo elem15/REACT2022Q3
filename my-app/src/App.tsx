@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import Main from 'components/Main/MainHooks';
+import Main from 'components/Main/MainAppState';
 import Layout from 'components/Layout/Layout';
 import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';

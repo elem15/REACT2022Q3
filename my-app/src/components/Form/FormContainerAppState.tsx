@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useReducer } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ICard } from 'components/Cards/Cards';
 import './Form.css';
@@ -18,12 +18,13 @@ export interface IForm {
   files: FileList | null;
   about: string;
 }
+
 type IData = ICard[] | [];
-enum CharacterActionKind {
+enum CardActionKind {
   ADD = 'ADD',
 }
 interface IAction {
-  type: CharacterActionKind;
+  type: CardActionKind;
   payload: ICard;
 }
 const schema = yup
@@ -44,7 +45,7 @@ const initialState: IData = [];
 const reducer = (state: IData, action: IAction) => {
   const { type, payload } = action;
   switch (type) {
-    case CharacterActionKind.ADD:
+    case CardActionKind.ADD:
       return [...state, payload];
     default:
       return state;
@@ -65,7 +66,7 @@ const FormPageContainer = () => {
     const { address, date, price, houseType, sold, isUrgent, files } = formData as IForm;
     const picture = files != null && files[0] ? URL.createObjectURL(files[0]) : '';
     dispatch({
-      type: CharacterActionKind.ADD,
+      type: CardActionKind.ADD,
       payload: {
         id: uuidv4(),
         houseType,

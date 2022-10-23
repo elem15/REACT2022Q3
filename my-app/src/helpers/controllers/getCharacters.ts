@@ -64,7 +64,7 @@ export const searchCharacters = async (name: string) => {
     };
   }
   const bracketIndex = name.indexOf('(');
-  const correctName = bracketIndex > -1 ? name.slice(bracketIndex) : name;
+  const correctName = bracketIndex > -1 ? name.slice(0, bracketIndex) : name;
   try {
     const response = await axios.get<IDocs>(
       `${routes.RINGS_BASE_URL + routes.CHARACTER}?name=${new RegExp(correctName, 'i')}`,
@@ -85,6 +85,12 @@ export const searchCharacters = async (name: string) => {
   } catch (e) {
     const error = e as AxiosError;
     const data = error.response?.data as IErrorData;
-    return { error: true, loading: false, docs: [], mode: Mode.SEARCH, errorMessage: data.message };
+    let errorMessage;
+    if (data instanceof Object) {
+      errorMessage = data.message;
+    } else {
+      errorMessage = data;
+    }
+    return { error: true, loading: false, docs: [], mode: Mode.SEARCH, errorMessage };
   }
 };
