@@ -1,7 +1,7 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { FormEvent, useState, useEffect, useReducer } from 'react';
+import React, { FormEvent, useEffect, useReducer, useRef } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
@@ -47,25 +47,18 @@ interface IProps {
   searchCharacters: (name: string) => Promise<IDataSearch>;
   loadCharacters: (page: number) => Promise<IDataLoad>;
 }
-const initialState: IState = {
-  loading: true,
-  error: false,
-  errorMessage: '',
-  searchValue: '',
-  page: 1,
-  pages: 0,
-  mode: Mode.LIST,
-  modalMode: false,
-  modalDoc: null,
-};
-
-interface INamesState {
+interface IMainState {
   names: IName[] | [];
   docs: ICharacter[];
+  state: IState;
 }
 enum CardActionKind {
   ADD_NAMES = 'ADD_NAMES',
   ADD_CHARACTERS = 'ADD_CHARACTERS',
+  INIT_LOADING = 'INIT_LOADING',
+  LOAD_CHARACTERS_STATE = 'LOAD_CHARACTERS_STATE',
+  CHANGE_PAGE = 'CHANGE_PAGE',
+  CHANGE_SEARCH_VALUE = 'CHANGE_SEARCH_VALUE',
 }
 interface INamesAction {
   type: CardActionKind.ADD_NAMES;
@@ -75,47 +68,91 @@ interface ICharactersAction {
   type: CardActionKind.ADD_CHARACTERS;
   payload: ICharacter[] | [];
 }
-type IAction = INamesAction | ICharactersAction;
-const initialNamesState: INamesState = {
+interface IInitLoadingAction {
+  type: CardActionKind.INIT_LOADING;
+}
+interface ILoadCharactersAction {
+  type: CardActionKind.LOAD_CHARACTERS_STATE;
+  payload: IState;
+}
+interface IChangePageAction {
+  type: CardActionKind.CHANGE_PAGE;
+  payload: number;
+}
+interface IChangeSearchValueAction {
+  type: CardActionKind.CHANGE_SEARCH_VALUE;
+  payload: string;
+}
+type IAction =
+  | INamesAction
+  | ICharactersAction
+  | IInitLoadingAction
+  | ILoadCharactersAction
+  | IChangePageAction
+  | IChangeSearchValueAction;
+const initialMainState: IMainState = {
   names: [],
   docs: [],
+  state: {
+    loading: true,
+    error: false,
+    errorMessage: '',
+    searchValue: '',
+    page: 1,
+    pages: 0,
+    mode: Mode.LIST,
+    modalMode: false,
+    modalDoc: null,
+  },
 };
-const reducer = (state: INamesState, action: IAction) => {
-  const { type, payload } = action;
+const reducer = (mainState: IMainState, action: IAction) => {
+  const { type } = action;
   switch (type) {
     case CardActionKind.ADD_NAMES:
-      return { ...state, names: payload };
+      return { ...mainState, names: action.payload };
     case CardActionKind.ADD_CHARACTERS:
-      return { ...state, docs: payload };
+      return { ...mainState, docs: action.payload };
+    case CardActionKind.INIT_LOADING:
+      return {
+        ...mainState,
+        state: {
+          ...mainState.state,
+          loading: true,
+          searchValue: localStorage.getItem('searchValue') ?? '',
+        },
+      };
+    case CardActionKind.LOAD_CHARACTERS_STATE:
+      return { ...mainState, state: action.payload };
+    case CardActionKind.CHANGE_PAGE:
+      return { ...mainState, state: { ...mainState.state, page: action.payload } };
+    case CardActionKind.CHANGE_SEARCH_VALUE:
+      return { ...mainState, state: { ...mainState.state, searchValue: action.payload } };
     default:
-      return state;
+      return mainState;
   }
 };
 
 const Main = (props: IProps) => {
-  const [state, setState] = useState(initialState);
-  const [namesState, dispatch] = useReducer(reducer, initialNamesState);
-
-  const { page, mode, loading, searchValue } = state;
+  const [mainState, dispatch] = useReducer(reducer, initialMainState);
+  const { page, mode, loading, searchValue } = mainState.state;
   useEffect(() => {
     if (mode === Mode.LIST) {
       const handleDataLoad = async (page: number) => {
-        setState({
-          ...state,
-          loading: true,
-          searchValue: localStorage.getItem('searchValue') ?? '',
-        });
+        dispatch({ type: CardActionKind.INIT_LOADING });
         const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
           page
         );
-        setState({
-          ...state,
-          loading,
-          pages: pages || state.pages,
-          error,
-          mode,
-          searchValue: localStorage.getItem('searchValue') ?? '',
-          errorMessage: errorMessage || undefined,
+        dispatch({
+          type: CardActionKind.LOAD_CHARACTERS_STATE,
+          payload: {
+            ...mainState.state,
+            loading,
+            pages: pages || mainState.state.pages,
+            error,
+            mode,
+            searchValue: localStorage.getItem('searchValue') ?? '',
+            errorMessage: errorMessage || undefined,
+          },
         });
         dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
       };
@@ -127,13 +164,16 @@ const Main = (props: IProps) => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
         const { docs, loading, error, mode, errorMessage } = await props.searchCharacters(name);
-        setState({
-          ...state,
-          loading,
-          error,
-          mode,
-          errorMessage,
-          searchValue: '',
+        dispatch({
+          type: CardActionKind.LOAD_CHARACTERS_STATE,
+          payload: {
+            ...mainState.state,
+            loading,
+            error,
+            mode,
+            errorMessage,
+            searchValue: '',
+          },
         });
         dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
       };
@@ -141,78 +181,102 @@ const Main = (props: IProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
+  const prevValueSearchRef: React.MutableRefObject<string | undefined> = useRef();
+  useEffect(() => {
+    prevValueSearchRef.current = mainState.state.searchValue;
+  }, [mainState.state.searchValue]);
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     localStorage.setItem('searchValue', value);
-    setState({
-      ...state,
-      searchValue: value,
-    });
+    dispatch({ type: CardActionKind.CHANGE_SEARCH_VALUE, payload: value });
     const data = await props.searchCharacters(value);
     const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
     dispatch({ type: CardActionKind.ADD_NAMES, payload: names });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setState({ ...state, loading: true, mode: Mode.SEARCH });
+    dispatch({
+      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      payload: {
+        ...mainState.state,
+        loading: true,
+        mode: Mode.SEARCH,
+      },
+    });
   };
   const handleDataNext = () => {
-    if (state.page < state.pages) {
-      setState({ ...state, page: (state.page += 1) });
+    if (mainState.state.page < mainState.state.pages) {
+      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page += 1) });
     }
   };
   const handleDataPrev = () => {
-    if (state.page > 1) {
-      setState({ ...state, page: (state.page -= 1) });
+    if (mainState.state.page > 1) {
+      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page -= 1) });
     }
   };
   const handleDataEnd = () => {
-    if (state.page < state.pages) {
-      setState({ ...state, page: state.pages });
+    if (mainState.state.page < mainState.state.pages) {
+      dispatch({
+        type: CardActionKind.CHANGE_PAGE,
+        payload: mainState.state.pages,
+      });
     }
   };
   const handleDataBegin = () => {
-    if (state.page > 1) {
-      setState({ ...state, page: 1 });
+    if (mainState.state.page > 1) {
+      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: 1 });
     }
   };
   const handleToListMode = async () => {
-    setState({ ...state, mode: Mode.LIST });
-  };
-  const handleRemoveModal = () => {
-    setState({ ...state, modalMode: false, modalDoc: null });
-  };
-  const handleCreateModal = (id: string) => {
-    const modalDoc = findModalData(id);
-    setState({
-      ...state,
-      modalMode: true,
-      modalDoc,
+    dispatch({
+      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      payload: {
+        ...mainState.state,
+        mode: Mode.LIST,
+      },
     });
   };
-  const findModalData = (id: string) => {
-    return namesState.docs.find((item) => item._id === id) || null;
+  const handleRemoveModal = () => {
+    dispatch({
+      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      payload: {
+        ...mainState.state,
+        modalMode: false,
+        modalDoc: null,
+      },
+    });
+  };
+  const handleCreateModal = (id: string) => {
+    const modalDoc = mainState.docs.find((item) => item._id === id) || null;
+    dispatch({
+      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      payload: {
+        ...mainState.state,
+        modalMode: true,
+        modalDoc,
+      },
+    });
   };
   return (
     <div className="App">
       <h1>The Lord of the Rings - search characters</h1>
       <Search
-        names={namesState.names}
-        searchValue={state.searchValue}
+        names={mainState.names}
+        searchValue={mainState.state.searchValue}
         handleOnChange={handleOnChange}
         handleOnSubmit={handleOnSubmit}
       />
-      {state.loading ? (
+      {mainState.state.loading ? (
         <div className="preloader">
           <Preloader />
         </div>
-      ) : state.error ? (
-        <NetworkError message={state.errorMessage} />
+      ) : mainState.state.error ? (
+        <NetworkError message={mainState.state.errorMessage} />
       ) : (
         <Characters
-          docs={namesState.docs}
-          page={state.page}
-          mode={state.mode}
+          docs={mainState.docs}
+          page={mainState.state.page}
+          mode={mainState.state.mode}
           handleDataNext={handleDataNext}
           handleDataPrev={handleDataPrev}
           handleDataEnd={handleDataEnd}
@@ -221,7 +285,9 @@ const Main = (props: IProps) => {
           handleCreateModal={handleCreateModal}
         />
       )}
-      {state.modalMode && <Modal handleRemoveModal={handleRemoveModal} modalDoc={state.modalDoc} />}
+      {mainState.state.modalMode && (
+        <Modal handleRemoveModal={handleRemoveModal} modalDoc={mainState.state.modalDoc} />
+      )}
     </div>
   );
 };

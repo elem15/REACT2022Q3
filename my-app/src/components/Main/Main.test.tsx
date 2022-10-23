@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Main from './MainHooks';
+import Main from './MainAppState';
 import { searchCharacters, loadCharacters } from '../../mockData/mockCharactersLoad';
 import userEvent from '@testing-library/user-event';
 

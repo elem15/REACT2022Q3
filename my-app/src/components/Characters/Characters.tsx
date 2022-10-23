@@ -1,4 +1,4 @@
-import { ICharacter } from 'components/Main/MainHooks';
+import { ICharacter } from 'components/Main/MainAppState';
 import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import Character from './Character';
@@ -32,7 +32,7 @@ const Characters = (props: IProps) => {
           ))}
         </div>
       ) : (
-        <div className="nothing-message">Nothing find</div>
+        <div className="nothing-message">Nothing found</div>
       )}
       {props.mode === Mode.LIST && (
         <div className="pagination">
