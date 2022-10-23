@@ -59,20 +59,34 @@ const initialState: IState = {
   modalDoc: null,
 };
 
-type INames = IName[] | [];
+interface INamesState {
+  names: IName[] | [];
+  docs: ICharacter[];
+}
 enum CardActionKind {
-  ADD = 'ADD_NAMES',
+  ADD_NAMES = 'ADD_NAMES',
+  ADD_CHARACTERS = 'ADD_CHARACTERS',
 }
-interface IAction {
-  type: CardActionKind;
-  payload: INames;
+interface INamesAction {
+  type: CardActionKind.ADD_NAMES;
+  payload: IName[] | [];
 }
-const initialNamesState: INames = [];
-const reducer = (state: INames, action: IAction) => {
+interface ICharactersAction {
+  type: CardActionKind.ADD_CHARACTERS;
+  payload: ICharacter[] | [];
+}
+type IAction = INamesAction | ICharactersAction;
+const initialNamesState: INamesState = {
+  names: [],
+  docs: [],
+};
+const reducer = (state: INamesState, action: IAction) => {
   const { type, payload } = action;
   switch (type) {
-    case CardActionKind.ADD:
-      return payload;
+    case CardActionKind.ADD_NAMES:
+      return { ...state, names: payload };
+    case CardActionKind.ADD_CHARACTERS:
+      return { ...state, docs: payload };
     default:
       return state;
   }
@@ -80,9 +94,7 @@ const reducer = (state: INames, action: IAction) => {
 
 const Main = (props: IProps) => {
   const [state, setState] = useState(initialState);
-  const [docs, setDocs] = useState([] as ICharacter[] | []);
-  // const [names, setNames] = useState([] as IName[] | []);
-  const [names, dispatch] = useReducer(reducer, initialNamesState);
+  const [namesState, dispatch] = useReducer(reducer, initialNamesState);
 
   const { page, mode, loading, searchValue } = state;
   useEffect(() => {
@@ -105,7 +117,7 @@ const Main = (props: IProps) => {
           searchValue: localStorage.getItem('searchValue') ?? '',
           errorMessage: errorMessage || undefined,
         });
-        setDocs(docs);
+        dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
       };
       handleDataLoad(page);
     }
@@ -123,7 +135,7 @@ const Main = (props: IProps) => {
           errorMessage,
           searchValue: '',
         });
-        setDocs(docs);
+        dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
       };
       handleDataSearch(searchValue);
     }
@@ -138,7 +150,7 @@ const Main = (props: IProps) => {
     });
     const data = await props.searchCharacters(value);
     const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-    dispatch({ type: CardActionKind.ADD, payload: names });
+    dispatch({ type: CardActionKind.ADD_NAMES, payload: names });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -179,13 +191,13 @@ const Main = (props: IProps) => {
     });
   };
   const findModalData = (id: string) => {
-    return docs.find((item) => item._id === id) || null;
+    return namesState.docs.find((item) => item._id === id) || null;
   };
   return (
     <div className="App">
       <h1>The Lord of the Rings - search characters</h1>
       <Search
-        names={names}
+        names={namesState.names}
         searchValue={state.searchValue}
         handleOnChange={handleOnChange}
         handleOnSubmit={handleOnSubmit}
@@ -198,7 +210,7 @@ const Main = (props: IProps) => {
         <NetworkError message={state.errorMessage} />
       ) : (
         <Characters
-          docs={docs}
+          docs={namesState.docs}
           page={state.page}
           mode={state.mode}
           handleDataNext={handleDataNext}
