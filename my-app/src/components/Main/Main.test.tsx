@@ -3,9 +3,13 @@ import { render, screen } from '@testing-library/react';
 import Main from './MainAppState';
 import { searchCharacters, loadCharacters } from '../../mockData/mockCharactersLoad';
 import userEvent from '@testing-library/user-event';
-
+const timers = {
+  timeout: null as NodeJS.Timeout | null,
+};
 test('renders main page with characters list', async () => {
-  render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
+  render(
+    <Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} timers={timers} />
+  );
   screen.findByPlaceholderText(/preloader/i);
   await new Promise(function (res) {
     setTimeout(() => res('done'), 100);
@@ -14,7 +18,9 @@ test('renders main page with characters list', async () => {
   screen.getAllByText(/Amrothos/i);
 });
 test('pagination main page with characters list', async () => {
-  render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
+  render(
+    <Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} timers={timers} />
+  );
   await new Promise(function (res) {
     setTimeout(() => res('done'), 1000);
   });
@@ -27,7 +33,9 @@ test('pagination main page with characters list', async () => {
   screen.getByText(/Aragorn/i);
 });
 test('render modal window', async () => {
-  render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
+  render(
+    <Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} timers={timers} />
+  );
   await new Promise(function (res) {
     setTimeout(() => res('done'), 100);
   });
@@ -39,7 +47,9 @@ test('render modal window', async () => {
   expect(screen.queryByText(/Brodda/i)).toBeNull();
 });
 test('search characters', async () => {
-  render(<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />);
+  render(
+    <Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} timers={timers} />
+  );
   await new Promise(function (res) {
     setTimeout(() => res('done'), 100);
   });

@@ -10,13 +10,22 @@ import { routes } from 'helpers/constants/routes';
 import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
 
 function App() {
+  const timers = {
+    timeout: null as NodeJS.Timeout | null,
+  };
   return (
     <BrowserRouter>
       <Routes>
         <Route path={routes.BASE_URL} element={<Layout />}>
           <Route
             index
-            element={<Main searchCharacters={searchCharacters} loadCharacters={loadCharacters} />}
+            element={
+              <Main
+                searchCharacters={searchCharacters}
+                loadCharacters={loadCharacters}
+                timers={timers}
+              />
+            }
           />
           <Route path={routes.FORM} element={<FormContainer />} />
           <Route path={routes.ABOUT} element={<About />} />

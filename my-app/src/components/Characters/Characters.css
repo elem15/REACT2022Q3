@@ -12,6 +12,7 @@
   border-radius: 5px;
   padding: 20px 20px;
   position: relative;
+  cursor: pointer;
 }
 .pagination {
   text-align: center;

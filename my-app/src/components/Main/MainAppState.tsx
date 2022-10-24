@@ -1,7 +1,7 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { FormEvent, useEffect, useReducer, useRef } from 'react';
+import React, { FormEvent, useEffect, useReducer } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
@@ -44,6 +44,7 @@ interface IState {
   modalDoc: ICharacter | null;
 }
 interface IProps {
+  timers: { timeout: NodeJS.Timeout | null };
   searchCharacters: (name: string) => Promise<IDataSearch>;
   loadCharacters: (page: number) => Promise<IDataLoad>;
 }
@@ -181,17 +182,23 @@ const Main = (props: IProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
-  const prevValueSearchRef: React.MutableRefObject<string | undefined> = useRef();
+
   useEffect(() => {
-    prevValueSearchRef.current = mainState.state.searchValue;
+    const handleNamesLoad = async (value: string) => {
+      if (props.timers.timeout) clearTimeout(props.timers.timeout);
+      props.timers.timeout = setTimeout(async () => {
+        const data = await props.searchCharacters(value);
+        const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
+        dispatch({ type: CardActionKind.ADD_NAMES, payload: names });
+      }, 1000);
+    };
+    handleNamesLoad(mainState.state.searchValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mainState.state.searchValue]);
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     localStorage.setItem('searchValue', value);
     dispatch({ type: CardActionKind.CHANGE_SEARCH_VALUE, payload: value });
-    const data = await props.searchCharacters(value);
-    const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-    dispatch({ type: CardActionKind.ADD_NAMES, payload: names });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
