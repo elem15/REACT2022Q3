@@ -1,12 +1,13 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { FormEvent, useEffect, useReducer } from 'react';
+import React, { FormEvent, useContext, useEffect } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
+import { CardActionKind, MainStateContext } from 'App';
 
 export interface ICharacter {
   _id: string;
@@ -32,7 +33,7 @@ export interface IName {
   name: string;
   id: string;
 }
-interface IState {
+export interface IState {
   loading: boolean;
   error: boolean;
   errorMessage?: string;
@@ -48,93 +49,9 @@ interface IProps {
   searchCharacters: (name: string) => Promise<IDataSearch>;
   loadCharacters: (page: number) => Promise<IDataLoad>;
 }
-interface IMainState {
-  names: IName[] | [];
-  docs: ICharacter[];
-  state: IState;
-}
-enum CardActionKind {
-  ADD_NAMES = 'ADD_NAMES',
-  ADD_CHARACTERS = 'ADD_CHARACTERS',
-  INIT_LOADING = 'INIT_LOADING',
-  LOAD_CHARACTERS_STATE = 'LOAD_CHARACTERS_STATE',
-  CHANGE_PAGE = 'CHANGE_PAGE',
-  CHANGE_SEARCH_VALUE = 'CHANGE_SEARCH_VALUE',
-}
-interface INamesAction {
-  type: CardActionKind.ADD_NAMES;
-  payload: IName[] | [];
-}
-interface ICharactersAction {
-  type: CardActionKind.ADD_CHARACTERS;
-  payload: ICharacter[] | [];
-}
-interface IInitLoadingAction {
-  type: CardActionKind.INIT_LOADING;
-}
-interface ILoadCharactersAction {
-  type: CardActionKind.LOAD_CHARACTERS_STATE;
-  payload: IState;
-}
-interface IChangePageAction {
-  type: CardActionKind.CHANGE_PAGE;
-  payload: number;
-}
-interface IChangeSearchValueAction {
-  type: CardActionKind.CHANGE_SEARCH_VALUE;
-  payload: string;
-}
-type IAction =
-  | INamesAction
-  | ICharactersAction
-  | IInitLoadingAction
-  | ILoadCharactersAction
-  | IChangePageAction
-  | IChangeSearchValueAction;
-const initialMainState: IMainState = {
-  names: [],
-  docs: [],
-  state: {
-    loading: true,
-    error: false,
-    errorMessage: '',
-    searchValue: '',
-    page: 1,
-    pages: 0,
-    mode: Mode.LIST,
-    modalMode: false,
-    modalDoc: null,
-  },
-};
-const reducer = (mainState: IMainState, action: IAction) => {
-  const { type } = action;
-  switch (type) {
-    case CardActionKind.ADD_NAMES:
-      return { ...mainState, names: action.payload };
-    case CardActionKind.ADD_CHARACTERS:
-      return { ...mainState, docs: action.payload };
-    case CardActionKind.INIT_LOADING:
-      return {
-        ...mainState,
-        state: {
-          ...mainState.state,
-          loading: true,
-          searchValue: localStorage.getItem('searchValue') ?? '',
-        },
-      };
-    case CardActionKind.LOAD_CHARACTERS_STATE:
-      return { ...mainState, state: action.payload };
-    case CardActionKind.CHANGE_PAGE:
-      return { ...mainState, state: { ...mainState.state, page: action.payload } };
-    case CardActionKind.CHANGE_SEARCH_VALUE:
-      return { ...mainState, state: { ...mainState.state, searchValue: action.payload } };
-    default:
-      return mainState;
-  }
-};
 
 const Main = (props: IProps) => {
-  const [mainState, dispatch] = useReducer(reducer, initialMainState);
+  const { mainState, dispatch } = useContext(MainStateContext);
   const { page, mode, loading, searchValue } = mainState.state;
   useEffect(() => {
     if (mode === Mode.LIST) {
