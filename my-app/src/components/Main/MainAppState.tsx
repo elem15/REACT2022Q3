@@ -55,8 +55,8 @@ const Main = (props: IProps) => {
   const { page, mode, loading, searchValue } = mainState.state;
   useEffect(() => {
     if (mode === Mode.LIST) {
+      dispatch({ type: CardActionKind.INIT_LOADING });
       const handleDataLoad = async (page: number) => {
-        dispatch({ type: CardActionKind.INIT_LOADING });
         const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
           page
         );

@@ -1,18 +1,25 @@
-import React, { createContext, FormEvent, useReducer } from 'react';
+import React, { createContext, useReducer } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Main, { ICharacter, IName, IState } from 'components/Main/MainAppState';
 import Layout from 'components/Layout/Layout';
 import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
-import FormContainer from 'components/Form/FormContainerAppState';
+import FormContainer, { IForm } from 'components/Form/FormContainerAppState';
 import { routes } from 'helpers/constants/routes';
 import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
 import { Mode } from 'helpers/constants/mode';
+import { ICard } from 'components/Cards/Cards';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { useForm } from 'react-hook-form';
+// import { UseFormHandleSubmit } from 'react-hook-form/dist/types/form';
+// import { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form/dist/types';
 
 export interface IMainState {
   names: IName[] | [];
   docs: ICharacter[];
+  cards: ICard[] | [];
   state: IState;
 }
 export enum CardActionKind {
@@ -22,6 +29,7 @@ export enum CardActionKind {
   LOAD_CHARACTERS_STATE = 'LOAD_CHARACTERS_STATE',
   CHANGE_PAGE = 'CHANGE_PAGE',
   CHANGE_SEARCH_VALUE = 'CHANGE_SEARCH_VALUE',
+  ADD_CARD = 'ADD_CARD',
 }
 interface INamesAction {
   type: CardActionKind.ADD_NAMES;
@@ -46,16 +54,22 @@ interface IChangeSearchValueAction {
   type: CardActionKind.CHANGE_SEARCH_VALUE;
   payload: string;
 }
+interface ICardAction {
+  type: CardActionKind.ADD_CARD;
+  payload: ICard;
+}
 export type IAction =
   | INamesAction
   | ICharactersAction
   | IInitLoadingAction
   | ILoadCharactersAction
   | IChangePageAction
-  | IChangeSearchValueAction;
+  | IChangeSearchValueAction
+  | ICardAction;
 const mainState: IMainState = {
   names: [],
   docs: [],
+  cards: [],
   state: {
     loading: true,
     error: false,
@@ -75,6 +89,8 @@ const reducer = (mainState: IMainState, action: IAction) => {
       return { ...mainState, names: action.payload };
     case CardActionKind.ADD_CHARACTERS:
       return { ...mainState, docs: action.payload };
+    case CardActionKind.ADD_CARD:
+      return { ...mainState, cards: [...mainState.cards, action.payload] };
     case CardActionKind.INIT_LOADING:
       return {
         ...mainState,
@@ -97,105 +113,73 @@ const reducer = (mainState: IMainState, action: IAction) => {
 const dispatch: React.Dispatch<IAction> = ({ type }) => {
   console.log(type);
 };
+const timers = {
+  timeout: null as NodeJS.Timeout | null,
+};
+const schema = yup
+  .object()
+  .shape({
+    address: yup.string().required().min(8, 'address must be more than 8 characters'),
+    price: yup.number().required().min(10000, 'min cost 10000 $'),
+    date: yup
+      .date()
+      .required()
+      .min(new Date('1950-01-01'), 'please start from 1950')
+      .max(new Date(), 'future dates are deprecated'),
+    houseType: yup.string().required().min(8, 'house type is required'),
+  })
+  .required();
 export const MainStateContext = createContext({ mainState, dispatch });
+// interface IFormContext {
+//   handleSubmit: UseFormHandleSubmit<FieldValues>;
+//   register: UseFormRegister<FieldValues & IForm>;
+//   errors: Partial<
+//     FieldErrorsImpl<{
+//       [x: string]: string;
+//     }>
+//   >;
+// }
+export const FormContext = createContext({
+  register: {},
+  handleSubmit: {},
+  errors: {},
+});
 function App() {
-  const timers = {
-    timeout: null as NodeJS.Timeout | null,
-  };
   const [reducerMainState, dispatch] = useReducer(reducer, mainState);
-  // const value = {
-  //   handleOnChange: async (e: FormEvent<HTMLInputElement>) => {
-  //     const { value } = e.target as HTMLInputElement;
-  //     localStorage.setItem('searchValue', value);
-  //     dispatch({ type: CardActionKind.CHANGE_SEARCH_VALUE, payload: value });
-  //   },
-  //   handleOnSubmit: (e: FormEvent) => {
-  //     e.preventDefault();
-  //     dispatch({
-  //       type: CardActionKind.LOAD_CHARACTERS_STATE,
-  //       payload: {
-  //         ...mainState.state,
-  //         loading: true,
-  //         mode: Mode.SEARCH,
-  //       },
-  //     });
-  //   },
-  //   handleDataNext: () => {
-  //     if (mainState.state.page < mainState.state.pages) {
-  //       dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page += 1) });
-  //     }
-  //   },
-  //   handleDataPrev: () => {
-  //     if (mainState.state.page > 1) {
-  //       dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page -= 1) });
-  //     }
-  //   },
-  //   handleDataEnd: () => {
-  //     if (mainState.state.page < mainState.state.pages) {
-  //       dispatch({
-  //         type: CardActionKind.CHANGE_PAGE,
-  //         payload: mainState.state.pages,
-  //       });
-  //     }
-  //   },
-  //   handleDataBegin: () => {
-  //     if (mainState.state.page > 1) {
-  //       dispatch({ type: CardActionKind.CHANGE_PAGE, payload: 1 });
-  //     }
-  //   },
-  //   handleToListMode: async () => {
-  //     dispatch({
-  //       type: CardActionKind.LOAD_CHARACTERS_STATE,
-  //       payload: {
-  //         ...mainState.state,
-  //         mode: Mode.LIST,
-  //       },
-  //     });
-  //   },
-  //   handleRemoveModal: () => {
-  //     dispatch({
-  //       type: CardActionKind.LOAD_CHARACTERS_STATE,
-  //       payload: {
-  //         ...mainState.state,
-  //         modalMode: false,
-  //         modalDoc: null,
-  //       },
-  //     });
-  //   },
-  //   handleCreateModal: (id: string) => {
-  //     const modalDoc = mainState.docs.find((item) => item._id === id) || null;
-  //     dispatch({
-  //       type: CardActionKind.LOAD_CHARACTERS_STATE,
-  //       payload: {
-  //         ...mainState.state,
-  //         modalMode: true,
-  //         modalDoc,
-  //       },
-  //     });
-  //   },
-  // };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IForm>({
+    resolver: yupResolver(schema),
+  });
   return (
     <MainStateContext.Provider value={{ mainState: reducerMainState, dispatch }}>
-      <BrowserRouter>
-        <Routes>
-          <Route path={routes.BASE_URL} element={<Layout />}>
-            <Route
-              index
-              element={
-                <Main
-                  searchCharacters={searchCharacters}
-                  loadCharacters={loadCharacters}
-                  timers={timers}
-                />
-              }
-            />
-            <Route path={routes.FORM} element={<FormContainer />} />
-            <Route path={routes.ABOUT} element={<About />} />
-            <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
-            <Route path={routes.NOT_DEFINED} element={<Navigate to={routes.NOT_FOUND} replace />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <FormContext.Provider value={{ register, handleSubmit, errors }}>
+        <BrowserRouter>
+          <Routes>
+            <Route path={routes.BASE_URL} element={<Layout />}>
+              <Route
+                index
+                element={
+                  <Main
+                    searchCharacters={searchCharacters}
+                    loadCharacters={loadCharacters}
+                    timers={timers}
+                  />
+                }
+              />
+              <Route path={routes.FORM} element={<FormContainer />} />
+              <Route path={routes.ABOUT} element={<About />} />
+              <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
+              <Route
+                path={routes.NOT_DEFINED}
+                element={<Navigate to={routes.NOT_FOUND} replace />}
+              />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </FormContext.Provider>
     </MainStateContext.Provider>
   );
 }

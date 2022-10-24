@@ -1,11 +1,10 @@
-import React, { useReducer } from 'react';
+import React, { useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ICard } from 'components/Cards/Cards';
 import './Form.css';
 import FormComponent from './FormComponentReactForm';
-import { FieldValues, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { FieldValues } from 'react-hook-form';
+import { CardActionKind, FormContext, MainStateContext } from 'App';
 
 export interface IForm {
   address: string;
@@ -19,54 +18,16 @@ export interface IForm {
   about: string;
 }
 
-type IData = ICard[] | [];
-enum CardActionKind {
-  ADD = 'ADD',
-}
-interface IAction {
-  type: CardActionKind;
-  payload: ICard;
-}
-const schema = yup
-  .object()
-  .shape({
-    address: yup.string().required().min(8, 'address must be more than 8 characters'),
-    price: yup.number().required().min(10000, 'min cost 10000 $'),
-    date: yup
-      .date()
-      .required()
-      .min(new Date('1950-01-01'), 'please start from 1950')
-      .max(new Date(), 'future dates are deprecated'),
-    houseType: yup.string().required().min(8, 'house type is required'),
-  })
-  .required();
-
-const initialState: IData = [];
-const reducer = (state: IData, action: IAction) => {
-  const { type, payload } = action;
-  switch (type) {
-    case CardActionKind.ADD:
-      return [...state, payload];
-    default:
-      return state;
-  }
-};
-
 const FormPageContainer = () => {
-  const [state, dispatch] = useReducer(reducer, initialState);
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<IForm>({
-    resolver: yupResolver(schema),
-  });
+  const { mainState, dispatch } = useContext(MainStateContext);
+
+  const { register, handleSubmit, errors } = useContext(FormContext);
 
   const submitForm = (formData: FieldValues) => {
     const { address, date, price, houseType, sold, isUrgent, files } = formData as IForm;
     const picture = files != null && files[0] ? URL.createObjectURL(files[0]) : '';
     dispatch({
-      type: CardActionKind.ADD,
+      type: CardActionKind.ADD_CARD,
       payload: {
         id: uuidv4(),
         houseType,
@@ -83,11 +44,15 @@ const FormPageContainer = () => {
 
   return (
     <FormComponent
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       register={register}
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       handleSubmit={handleSubmit}
       errors={errors}
       submitForm={submitForm}
-      data={state}
+      data={mainState.cards}
     />
   );
 };
