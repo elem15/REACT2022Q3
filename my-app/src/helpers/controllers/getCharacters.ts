@@ -22,10 +22,18 @@ export interface IErrorData {
   message: string;
   success: boolean;
 }
-export const loadCharacters = async (page: number) => {
+export interface ILoadCharactersArg {
+  page: number;
+  order: string;
+  sortBy: string;
+  gender: string;
+}
+export const loadCharacters = async ({ page, order, sortBy, gender }: ILoadCharactersArg) => {
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}${
+        sortBy && `&sort=${sortBy}:${order}`
+      }${gender && `&gender=${gender}`}`,
       {
         headers: {
           'Content-Type': 'application/json',

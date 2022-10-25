@@ -29,8 +29,14 @@ function App() {
     resolver: yupResolver(schema),
   });
   useEffect(() => {
+    const { order, sortBy, gender } = mainState.state;
     const handleDataLoad = async (page: number) => {
-      const { docs, loading, pages, error, errorMessage } = await loadCharacters(page);
+      const { docs, loading, pages, error, errorMessage } = await loadCharacters({
+        page,
+        order,
+        sortBy,
+        gender,
+      });
       dispatch({
         type: ActionKind.LOAD_CHARACTERS_STATE,
         payload: {
@@ -38,7 +44,7 @@ function App() {
           loading,
           pages: pages || mainState.state.pages,
           error,
-          searchValue: localStorage.getItem('searchValue') ?? '',
+          searchValue: '',
           errorMessage: errorMessage || undefined,
         },
       });

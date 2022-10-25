@@ -4,11 +4,12 @@ import { Mode } from 'helpers/constants/mode';
 import React, { FormEvent, useContext, useEffect } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
-import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
+import { IDataLoad, IDataSearch, ILoadCharactersArg } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
 import { MainStateContext } from 'state/context';
 import { ActionKind } from 'helpers/constants/actions';
+import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 
 export interface ICharacter {
   _id: string;
@@ -44,21 +45,29 @@ export interface IState {
   mode: Mode;
   modalMode: boolean;
   modalDoc: ICharacter | null;
+  order: SortingOrder;
+  sortBy: SortingValues;
+  gender: GenderType;
 }
 interface IProps {
   timers: { timeout: NodeJS.Timeout | null };
   searchCharacters: (name: string) => Promise<IDataSearch>;
-  loadCharacters: (page: number) => Promise<IDataLoad>;
+  loadCharacters: ({ page, order, sortBy, gender }: ILoadCharactersArg) => Promise<IDataLoad>;
 }
 
 const Main = (props: IProps) => {
   const { mainState, dispatch } = useContext(MainStateContext);
-  const { page, mode, loading, searchValue } = mainState.state;
+  const { page, mode, loading, searchValue, gender, sortBy, order } = mainState.state;
   const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
     if (mode === Mode.LIST && loading === true) {
       const handleDataLoad = async (page: number) => {
-        const { docs, loading, pages, error, mode, errorMessage } = await loadCharacters(page);
+        const { docs, loading, pages, error, mode, errorMessage } = await loadCharacters({
+          page,
+          gender,
+          sortBy,
+          order,
+        });
         dispatch({
           type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
@@ -67,7 +76,7 @@ const Main = (props: IProps) => {
             pages: pages || mainState.state.pages,
             error,
             mode,
-            searchValue: localStorage.getItem('searchValue') ?? '',
+            searchValue: '',
             errorMessage: errorMessage || undefined,
           },
         });
@@ -75,7 +84,7 @@ const Main = (props: IProps) => {
       };
       handleDataLoad(page);
     }
-  }, [page, mode, loadCharacters, dispatch, loading, mainState.state]);
+  }, [page, mode, loadCharacters, dispatch, loading, mainState.state, gender, sortBy, order]);
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
@@ -108,10 +117,11 @@ const Main = (props: IProps) => {
     handleNamesLoad(mainState.state.searchValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
-  const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
-    const { value } = e.target as HTMLInputElement;
-    localStorage.setItem('searchValue', value);
-    dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: value });
+  const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { value, name } = e.target as HTMLInputElement;
+    const key = name as keyof IState;
+    // localStorage.setItem('searchValue', value);
+    dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: { key, value } });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -186,6 +196,7 @@ const Main = (props: IProps) => {
         searchValue={mainState.state.searchValue}
         handleOnChange={handleOnChange}
         handleOnSubmit={handleOnSubmit}
+        handleToListMode={handleToListMode}
       />
       {mainState.state.loading ? (
         <div className="preloader">

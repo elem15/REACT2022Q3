@@ -1,6 +1,7 @@
 import { ICard } from 'components/Cards/Cards';
 import { ICharacter, IName, IState } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
+import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import { ActionKind } from '../helpers/constants/actions';
 
 interface IMainState {
@@ -27,7 +28,7 @@ interface IChangePageAction {
 }
 interface IChangeSearchValueAction {
   type: ActionKind.CHANGE_SEARCH_VALUE;
-  payload: string;
+  payload: { key: keyof IState; value: string };
 }
 interface ICardAction {
   type: ActionKind.ADD_CARD;
@@ -54,6 +55,9 @@ export const mainState: IMainState = {
     mode: Mode.LIST,
     modalMode: false,
     modalDoc: null,
+    order: SortingOrder.ASC,
+    sortBy: SortingValues.DEFAULT,
+    gender: GenderType.DEFAULT,
   },
 };
 export const reducer = (mainState: IMainState, action: IAction) => {
@@ -70,7 +74,10 @@ export const reducer = (mainState: IMainState, action: IAction) => {
     case ActionKind.CHANGE_PAGE:
       return { ...mainState, state: { ...mainState.state, page: action.payload, loading: true } };
     case ActionKind.CHANGE_SEARCH_VALUE:
-      return { ...mainState, state: { ...mainState.state, searchValue: action.payload } };
+      return {
+        ...mainState,
+        state: { ...mainState.state, [action.payload.key]: action.payload.value },
+      };
     default:
       return mainState;
   }

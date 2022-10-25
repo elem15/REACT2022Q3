@@ -27,6 +27,10 @@ const Modal = (props: IProps) => {
             </div>
             <hr />
             <div>
+              gender: <strong>{props.modalDoc.gender}</strong>
+            </div>
+            <hr />
+            <div>
               birth: <strong>{props.modalDoc.birth}</strong>
             </div>
             <hr />
