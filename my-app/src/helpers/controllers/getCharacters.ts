@@ -1,5 +1,5 @@
 import axios, { AxiosError } from 'axios';
-import { ICharacter, IDocs } from 'components/Main/MainAppState';
+import { ICharacter, IDocs } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
 

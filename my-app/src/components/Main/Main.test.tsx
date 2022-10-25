@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Main from './MainAppState';
+import Main from './Main';
 import { searchCharacters, loadCharacters } from '../../mockData/mockCharactersLoad';
 import userEvent from '@testing-library/user-event';
 const timers = {

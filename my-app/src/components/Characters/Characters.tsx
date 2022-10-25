@@ -1,4 +1,4 @@
-import { ICharacter } from 'components/Main/MainAppState';
+import { ICharacter } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import Character from './Character';

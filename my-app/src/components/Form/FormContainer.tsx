@@ -2,9 +2,10 @@ import React, { useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ICard } from 'components/Cards/Cards';
 import './Form.css';
-import FormComponent from './FormComponentReactForm';
+import FormComponent from './FormComponent';
 import { FieldValues } from 'react-hook-form';
-import { CardActionKind, MainStateContext } from 'App';
+import { MainStateContext } from 'state/context';
+import { ActionKind } from 'helpers/constants/actions';
 
 export interface IForm {
   address: string;
@@ -25,7 +26,7 @@ const FormPageContainer = () => {
     const { address, date, price, houseType, sold, isUrgent, files } = formData as IForm;
     const picture = files != null && files[0] ? URL.createObjectURL(files[0]) : '';
     dispatch({
-      type: CardActionKind.ADD_CARD,
+      type: ActionKind.ADD_CARD,
       payload: {
         id: uuidv4(),
         houseType,

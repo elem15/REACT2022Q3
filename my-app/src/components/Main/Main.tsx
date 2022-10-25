@@ -7,7 +7,8 @@ import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
-import { CardActionKind, MainStateContext } from 'App';
+import { MainStateContext } from 'state/context';
+import { ActionKind } from 'helpers/constants/actions';
 
 export interface ICharacter {
   _id: string;
@@ -55,13 +56,13 @@ const Main = (props: IProps) => {
   const { page, mode, loading, searchValue } = mainState.state;
   useEffect(() => {
     if (mode === Mode.LIST) {
-      dispatch({ type: CardActionKind.INIT_LOADING });
+      dispatch({ type: ActionKind.INIT_LOADING });
       const handleDataLoad = async (page: number) => {
         const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
           page
         );
         dispatch({
-          type: CardActionKind.LOAD_CHARACTERS_STATE,
+          type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
             ...mainState.state,
             loading,
@@ -72,7 +73,7 @@ const Main = (props: IProps) => {
             errorMessage: errorMessage || undefined,
           },
         });
-        dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
+        dispatch({ type: ActionKind.ADD_CHARACTERS, payload: docs });
       };
       handleDataLoad(page);
     }
@@ -83,7 +84,7 @@ const Main = (props: IProps) => {
       const handleDataSearch = async (name: string) => {
         const { docs, loading, error, mode, errorMessage } = await props.searchCharacters(name);
         dispatch({
-          type: CardActionKind.LOAD_CHARACTERS_STATE,
+          type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
             ...mainState.state,
             loading,
@@ -93,7 +94,7 @@ const Main = (props: IProps) => {
             searchValue: '',
           },
         });
-        dispatch({ type: CardActionKind.ADD_CHARACTERS, payload: docs });
+        dispatch({ type: ActionKind.ADD_CHARACTERS, payload: docs });
       };
       handleDataSearch(searchValue);
     }
@@ -106,7 +107,7 @@ const Main = (props: IProps) => {
       props.timers.timeout = setTimeout(async () => {
         const data = await props.searchCharacters(value);
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-        dispatch({ type: CardActionKind.ADD_NAMES, payload: names });
+        dispatch({ type: ActionKind.ADD_NAMES, payload: names });
       }, 1000);
     };
     handleNamesLoad(mainState.state.searchValue);
@@ -115,12 +116,12 @@ const Main = (props: IProps) => {
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     localStorage.setItem('searchValue', value);
-    dispatch({ type: CardActionKind.CHANGE_SEARCH_VALUE, payload: value });
+    dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: value });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
     dispatch({
-      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      type: ActionKind.LOAD_CHARACTERS_STATE,
       payload: {
         ...mainState.state,
         loading: true,
@@ -130,30 +131,30 @@ const Main = (props: IProps) => {
   };
   const handleDataNext = () => {
     if (mainState.state.page < mainState.state.pages) {
-      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page += 1) });
+      dispatch({ type: ActionKind.CHANGE_PAGE, payload: (mainState.state.page += 1) });
     }
   };
   const handleDataPrev = () => {
     if (mainState.state.page > 1) {
-      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: (mainState.state.page -= 1) });
+      dispatch({ type: ActionKind.CHANGE_PAGE, payload: (mainState.state.page -= 1) });
     }
   };
   const handleDataEnd = () => {
     if (mainState.state.page < mainState.state.pages) {
       dispatch({
-        type: CardActionKind.CHANGE_PAGE,
+        type: ActionKind.CHANGE_PAGE,
         payload: mainState.state.pages,
       });
     }
   };
   const handleDataBegin = () => {
     if (mainState.state.page > 1) {
-      dispatch({ type: CardActionKind.CHANGE_PAGE, payload: 1 });
+      dispatch({ type: ActionKind.CHANGE_PAGE, payload: 1 });
     }
   };
   const handleToListMode = async () => {
     dispatch({
-      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      type: ActionKind.LOAD_CHARACTERS_STATE,
       payload: {
         ...mainState.state,
         mode: Mode.LIST,
@@ -162,7 +163,7 @@ const Main = (props: IProps) => {
   };
   const handleRemoveModal = () => {
     dispatch({
-      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      type: ActionKind.LOAD_CHARACTERS_STATE,
       payload: {
         ...mainState.state,
         modalMode: false,
@@ -173,7 +174,7 @@ const Main = (props: IProps) => {
   const handleCreateModal = (id: string) => {
     const modalDoc = mainState.docs.find((item) => item._id === id) || null;
     dispatch({
-      type: CardActionKind.LOAD_CHARACTERS_STATE,
+      type: ActionKind.LOAD_CHARACTERS_STATE,
       payload: {
         ...mainState.state,
         modalMode: true,

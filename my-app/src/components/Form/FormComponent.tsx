@@ -2,7 +2,7 @@ import Cards from 'components/Cards/Cards';
 import React, { useContext } from 'react';
 import { FieldValues } from 'react-hook-form/dist/types';
 import './Form.css';
-import { FormContext, MainStateContext } from 'App';
+import { FormContext, MainStateContext } from 'state/context';
 
 interface IFormComponentProps {
   submitForm: (data: FieldValues) => void;
