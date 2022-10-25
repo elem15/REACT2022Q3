@@ -4,7 +4,7 @@ import { ICard } from 'components/Cards/Cards';
 import './Form.css';
 import FormComponent from './FormComponentReactForm';
 import { FieldValues } from 'react-hook-form';
-import { CardActionKind, FormContext, MainStateContext } from 'App';
+import { CardActionKind, MainStateContext } from 'App';
 
 export interface IForm {
   address: string;
@@ -19,9 +19,7 @@ export interface IForm {
 }
 
 const FormPageContainer = () => {
-  const { mainState, dispatch } = useContext(MainStateContext);
-
-  const { register, handleSubmit, errors } = useContext(FormContext);
+  const { dispatch } = useContext(MainStateContext);
 
   const submitForm = (formData: FieldValues) => {
     const { address, date, price, houseType, sold, isUrgent, files } = formData as IForm;
@@ -42,19 +40,7 @@ const FormPageContainer = () => {
     });
   };
 
-  return (
-    <FormComponent
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      register={register}
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      handleSubmit={handleSubmit}
-      errors={errors}
-      submitForm={submitForm}
-      data={mainState.cards}
-    />
-  );
+  return <FormComponent submitForm={submitForm} />;
 };
 
 export default FormPageContainer;

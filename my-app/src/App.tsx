@@ -13,8 +13,8 @@ import { ICard } from 'components/Cards/Cards';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
-// import { UseFormHandleSubmit } from 'react-hook-form/dist/types/form';
-// import { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form/dist/types';
+import { UseFormHandleSubmit } from 'react-hook-form/dist/types/form';
+import { FieldErrorsImpl, FieldValues, UseFormRegister } from 'react-hook-form/dist/types';
 
 export interface IMainState {
   names: IName[] | [];
@@ -130,20 +130,17 @@ const schema = yup
   })
   .required();
 export const MainStateContext = createContext({ mainState, dispatch });
-// interface IFormContext {
-//   handleSubmit: UseFormHandleSubmit<FieldValues>;
-//   register: UseFormRegister<FieldValues & IForm>;
-//   errors: Partial<
-//     FieldErrorsImpl<{
-//       [x: string]: string;
-//     }>
-//   >;
-// }
-export const FormContext = createContext({
-  register: {},
-  handleSubmit: {},
-  errors: {},
-});
+export interface IFormContext {
+  handleSubmit?: UseFormHandleSubmit<FieldValues>;
+  register?: UseFormRegister<FieldValues & IForm>;
+  errors?: Partial<
+    FieldErrorsImpl<{
+      [x: string]: string;
+    }>
+  >;
+}
+
+export const FormContext = createContext<IFormContext>({});
 function App() {
   const [reducerMainState, dispatch] = useReducer(reducer, mainState);
   const {
@@ -155,7 +152,7 @@ function App() {
   });
   return (
     <MainStateContext.Provider value={{ mainState: reducerMainState, dispatch }}>
-      <FormContext.Provider value={{ register, handleSubmit, errors }}>
+      <FormContext.Provider value={{ register, handleSubmit, errors } as IFormContext}>
         <BrowserRouter>
           <Routes>
             <Route path={routes.BASE_URL} element={<Layout />}>
