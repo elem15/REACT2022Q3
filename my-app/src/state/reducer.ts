@@ -17,9 +17,6 @@ interface ICharactersAction {
   type: ActionKind.ADD_CHARACTERS;
   payload: ICharacter[];
 }
-interface IInitLoadingAction {
-  type: ActionKind.INIT_LOADING;
-}
 interface ILoadCharactersAction {
   type: ActionKind.LOAD_CHARACTERS_STATE;
   payload: IState;
@@ -39,7 +36,6 @@ interface ICardAction {
 export type IAction =
   | INamesAction
   | ICharactersAction
-  | IInitLoadingAction
   | ILoadCharactersAction
   | IChangePageAction
   | IChangeSearchValueAction
@@ -69,19 +65,10 @@ export const reducer = (mainState: IMainState, action: IAction) => {
       return { ...mainState, docs: action.payload };
     case ActionKind.ADD_CARD:
       return { ...mainState, cards: [...mainState.cards, action.payload] };
-    case ActionKind.INIT_LOADING:
-      return {
-        ...mainState,
-        state: {
-          ...mainState.state,
-          loading: true,
-          searchValue: localStorage.getItem('searchValue') ?? '',
-        },
-      };
     case ActionKind.LOAD_CHARACTERS_STATE:
       return { ...mainState, state: action.payload };
     case ActionKind.CHANGE_PAGE:
-      return { ...mainState, state: { ...mainState.state, page: action.payload } };
+      return { ...mainState, state: { ...mainState.state, page: action.payload, loading: true } };
     case ActionKind.CHANGE_SEARCH_VALUE:
       return { ...mainState, state: { ...mainState.state, searchValue: action.payload } };
     default:

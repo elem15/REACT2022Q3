@@ -54,13 +54,11 @@ interface IProps {
 const Main = (props: IProps) => {
   const { mainState, dispatch } = useContext(MainStateContext);
   const { page, mode, loading, searchValue } = mainState.state;
+  const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
-    if (mode === Mode.LIST) {
-      dispatch({ type: ActionKind.INIT_LOADING });
+    if (mode === Mode.LIST && loading === true) {
       const handleDataLoad = async (page: number) => {
-        const { docs, loading, pages, error, mode, errorMessage } = await props.loadCharacters(
-          page
-        );
+        const { docs, loading, pages, error, mode, errorMessage } = await loadCharacters(page);
         dispatch({
           type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
@@ -77,12 +75,11 @@ const Main = (props: IProps) => {
       };
       handleDataLoad(page);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, mode]);
+  }, [page, mode, loadCharacters, dispatch, loading, mainState.state]);
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
-        const { docs, loading, error, mode, errorMessage } = await props.searchCharacters(name);
+        const { docs, loading, error, mode, errorMessage } = await searchCharacters(name);
         dispatch({
           type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
@@ -98,13 +95,11 @@ const Main = (props: IProps) => {
       };
       handleDataSearch(searchValue);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
-
+  }, [loading, dispatch, mainState.state, mode, searchCharacters, searchValue]);
   useEffect(() => {
     const handleNamesLoad = async (value: string) => {
-      if (props.timers.timeout) clearTimeout(props.timers.timeout);
-      props.timers.timeout = setTimeout(async () => {
+      if (timers.timeout) clearTimeout(timers.timeout);
+      timers.timeout = setTimeout(async () => {
         const data = await props.searchCharacters(value);
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
         dispatch({ type: ActionKind.ADD_NAMES, payload: names });
@@ -112,7 +107,7 @@ const Main = (props: IProps) => {
     };
     handleNamesLoad(mainState.state.searchValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mainState.state.searchValue]);
+  }, [searchValue]);
   const handleOnChange = async (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.target as HTMLInputElement;
     localStorage.setItem('searchValue', value);
@@ -158,6 +153,7 @@ const Main = (props: IProps) => {
       payload: {
         ...mainState.state,
         mode: Mode.LIST,
+        loading: true,
       },
     });
   };

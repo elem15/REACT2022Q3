@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 import Main from 'components/Main/Main';
@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { mainState, reducer } from 'state/reducer';
 import { FormContext, IFormContext, MainStateContext } from 'state/context';
 import { schema } from 'components/Form/FormSchema';
+import { ActionKind } from 'helpers/constants/actions';
 
 const timers = {
   timeout: null as NodeJS.Timeout | null,
@@ -27,6 +28,24 @@ function App() {
   } = useForm<IForm>({
     resolver: yupResolver(schema),
   });
+  useEffect(() => {
+    const handleDataLoad = async (page: number) => {
+      const { docs, loading, pages, error, errorMessage } = await loadCharacters(page);
+      dispatch({
+        type: ActionKind.LOAD_CHARACTERS_STATE,
+        payload: {
+          ...mainState.state,
+          loading,
+          pages: pages || mainState.state.pages,
+          error,
+          searchValue: localStorage.getItem('searchValue') ?? '',
+          errorMessage: errorMessage || undefined,
+        },
+      });
+      dispatch({ type: ActionKind.ADD_CHARACTERS, payload: docs });
+    };
+    handleDataLoad(1);
+  }, []);
   return (
     <MainStateContext.Provider value={{ mainState: reducerMainState, dispatch }}>
       <FormContext.Provider value={{ register, handleSubmit, errors } as IFormContext}>
