@@ -1,16 +1,17 @@
-import { IName } from 'components/Main/Main';
+import { IName, IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import React, { FormEvent } from 'react';
 import './Search.css';
 interface IProps {
+  state: IState;
   names: IName[];
-  searchValue: string;
   handleOnChange: (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleOnSubmit: (e: FormEvent) => void;
   handleToListMode: () => void;
 }
 
 const Search = (props: IProps) => {
+  const { searchValue, gender, sort, order } = props.state;
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     props.handleToListMode();
@@ -25,7 +26,7 @@ const Search = (props: IProps) => {
           type="search"
           autoComplete="off"
           placeholder="character's name"
-          value={props.searchValue}
+          value={searchValue}
           onChange={props.handleOnChange}
         />
         <datalist id="search">
@@ -35,18 +36,33 @@ const Search = (props: IProps) => {
         <button className="search-items search-button">search by name</button>
       </form>
       <form className="search-form" onSubmit={handleSubmit}>
-        <select className="search-items" name="order" onChange={props.handleOnChange}>
+        <select
+          className="search-items"
+          name="order"
+          defaultValue={order}
+          onChange={props.handleOnChange}
+        >
           <option value={SortingOrder.ASC}>direct sort</option>
           <option value={SortingOrder.DESC}>reverse sort</option>
         </select>
         <hr />
-        <select className="search-items" name="sortBy" onChange={props.handleOnChange}>
+        <select
+          className="search-items"
+          name="sort"
+          defaultValue={sort}
+          onChange={props.handleOnChange}
+        >
           <option value={SortingValues.DEFAULT}>unsorted by value</option>
           <option value={SortingValues.NAME}>sort by name</option>
           <option value={SortingValues.RACE}>sort by race</option>
         </select>
         <hr />
-        <select className="search-items" name="gender" onChange={props.handleOnChange}>
+        <select
+          className="search-items"
+          name="gender"
+          defaultValue={gender}
+          onChange={props.handleOnChange}
+        >
           <option value={GenderType.DEFAULT}>unselected by gender</option>
           <option value={GenderType.MALE}>male</option>
           <option value={GenderType.FEMALE}>female</option>

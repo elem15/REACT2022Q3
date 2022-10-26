@@ -56,7 +56,7 @@ export const mainState: IMainState = {
     modalMode: false,
     modalDoc: null,
     order: SortingOrder.ASC,
-    sortBy: SortingValues.DEFAULT,
+    sort: SortingValues.DEFAULT,
     gender: GenderType.DEFAULT,
   },
 };

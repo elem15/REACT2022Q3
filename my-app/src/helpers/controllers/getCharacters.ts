@@ -22,18 +22,23 @@ export interface IErrorData {
   message: string;
   success: boolean;
 }
-export interface ILoadCharactersArg {
+export interface ILoadCharactersArgs {
   page: number;
   order: string;
-  sortBy: string;
+  sort: string;
   gender: string;
 }
-export const loadCharacters = async ({ page, order, sortBy, gender }: ILoadCharactersArg) => {
+export const loadCharacters = async (args: ILoadCharactersArgs) => {
+  const { order, sort } = args;
+  const query = Object.entries(args)
+    .filter(([key, value]) => key !== 'sort' && key !== 'order' && value)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20&page=${page}${
-        sortBy && `&sort=${sortBy}:${order}`
-      }${gender && `&gender=${gender}`}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20${query}${
+        sort && `&sort=${sort}:${order}`
+      }`,
       {
         headers: {
           'Content-Type': 'application/json',

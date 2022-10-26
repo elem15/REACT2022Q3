@@ -4,7 +4,7 @@ import { Mode } from 'helpers/constants/mode';
 import React, { FormEvent, useContext, useEffect } from 'react';
 import './Main.css';
 import Modal from 'components/Characters/Modal';
-import { IDataLoad, IDataSearch, ILoadCharactersArg } from 'helpers/controllers/getCharacters';
+import { IDataLoad, IDataSearch, ILoadCharactersArgs } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
 import { MainStateContext } from 'state/context';
@@ -46,18 +46,18 @@ export interface IState {
   modalMode: boolean;
   modalDoc: ICharacter | null;
   order: SortingOrder;
-  sortBy: SortingValues;
+  sort: SortingValues;
   gender: GenderType;
 }
 interface IProps {
   timers: { timeout: NodeJS.Timeout | null };
   searchCharacters: (name: string) => Promise<IDataSearch>;
-  loadCharacters: ({ page, order, sortBy, gender }: ILoadCharactersArg) => Promise<IDataLoad>;
+  loadCharacters: ({ page, order, sort, gender }: ILoadCharactersArgs) => Promise<IDataLoad>;
 }
 
 const Main = (props: IProps) => {
   const { mainState, dispatch } = useContext(MainStateContext);
-  const { page, mode, loading, searchValue, gender, sortBy, order } = mainState.state;
+  const { page, mode, loading, searchValue, gender, sort, order } = mainState.state;
   const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
     if (mode === Mode.LIST && loading === true) {
@@ -65,7 +65,7 @@ const Main = (props: IProps) => {
         const { docs, loading, pages, error, mode, errorMessage } = await loadCharacters({
           page,
           gender,
-          sortBy,
+          sort,
           order,
         });
         dispatch({
@@ -84,7 +84,7 @@ const Main = (props: IProps) => {
       };
       handleDataLoad(page);
     }
-  }, [page, mode, loadCharacters, dispatch, loading, mainState.state, gender, sortBy, order]);
+  }, [page, mode, loadCharacters, dispatch, loading, mainState.state, gender, sort, order]);
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
@@ -109,6 +109,7 @@ const Main = (props: IProps) => {
     const handleNamesLoad = async (value: string) => {
       if (timers.timeout) clearTimeout(timers.timeout);
       timers.timeout = setTimeout(async () => {
+        localStorage.setItem('searchValue', value);
         const data = await props.searchCharacters(value);
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
         dispatch({ type: ActionKind.ADD_NAMES, payload: names });
@@ -120,7 +121,6 @@ const Main = (props: IProps) => {
   const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { value, name } = e.target as HTMLInputElement;
     const key = name as keyof IState;
-    // localStorage.setItem('searchValue', value);
     dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: { key, value } });
   };
   const handleOnSubmit = (e: FormEvent) => {
@@ -193,7 +193,7 @@ const Main = (props: IProps) => {
       <h1>The Lord of the Rings - search characters</h1>
       <Search
         names={mainState.names}
-        searchValue={mainState.state.searchValue}
+        state={mainState.state}
         handleOnChange={handleOnChange}
         handleOnSubmit={handleOnSubmit}
         handleToListMode={handleToListMode}
