@@ -25,5 +25,4 @@ const Character = (props: IProps) => {
     </div>
   );
 };
-
 export default Character;

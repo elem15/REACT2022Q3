@@ -8,4 +8,5 @@ export enum routes {
   BOOK = '/book',
   MOVIE = '/movie',
   CHARACTER = '/character',
+  DETAIL = '/detail',
 }

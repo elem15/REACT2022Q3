@@ -14,6 +14,7 @@ import { mainState, reducer } from 'state/reducer';
 import { FormContext, IFormContext, MainStateContext } from 'state/context';
 import { schema } from 'components/Form/FormSchema';
 import { ActionKind } from 'helpers/constants/actions';
+import Detail from 'components/Characters/CharacterDetail';
 
 const timers = {
   timeout: null as NodeJS.Timeout | null,
@@ -70,6 +71,7 @@ function App() {
                   />
                 }
               />
+              <Route path={routes.DETAIL} element={<Detail />} />
               <Route path={routes.FORM} element={<FormContainer />} />
               <Route path={routes.ABOUT} element={<About />} />
               <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />

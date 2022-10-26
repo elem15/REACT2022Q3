@@ -3,13 +3,14 @@ import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
 import React, { FormEvent, useContext, useEffect } from 'react';
 import './Main.css';
-import Modal from 'components/Characters/Modal';
 import { IDataLoad, IDataSearch, ILoadCharactersArgs } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
 import { MainStateContext } from 'state/context';
 import { ActionKind } from 'helpers/constants/actions';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
+import { useNavigate } from 'react-router-dom';
+import { routes } from 'helpers/constants/routes';
 
 export interface ICharacter {
   _id: string;
@@ -192,16 +193,7 @@ const Main = (props: IProps) => {
       },
     });
   };
-  const handleRemoveModal = () => {
-    dispatch({
-      type: ActionKind.LOAD_CHARACTERS_STATE,
-      payload: {
-        ...mainState.state,
-        modalMode: false,
-        modalDoc: null,
-      },
-    });
-  };
+  const navigate = useNavigate();
   const handleCreateModal = (id: string) => {
     const modalDoc = mainState.docs.find((item) => item._id === id) || null;
     dispatch({
@@ -212,6 +204,7 @@ const Main = (props: IProps) => {
         modalDoc,
       },
     });
+    navigate(routes.DETAIL, { replace: false });
   };
   return (
     <div className="App">
@@ -241,9 +234,6 @@ const Main = (props: IProps) => {
           handleToListMode={handleToListMode}
           handleCreateModal={handleCreateModal}
         />
-      )}
-      {mainState.state.modalMode && (
-        <Modal handleRemoveModal={handleRemoveModal} modalDoc={mainState.state.modalDoc} />
       )}
     </div>
   );

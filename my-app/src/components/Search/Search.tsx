@@ -1,7 +1,7 @@
 import { IName, IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import React, { FormEvent } from 'react';
-import './Search.css';
+import styles from './Search.module.css';
 interface IProps {
   state: IState;
   names: IName[];
@@ -17,8 +17,8 @@ const Search = (props: IProps) => {
     props.handleToListMode();
   };
   return (
-    <section className="search-section">
-      <form className="search-form" onSubmit={props.handleOnSubmit}>
+    <section className={styles.searchSection}>
+      <form className={styles.searchForm} onSubmit={props.handleOnSubmit}>
         <input
           className="search-items"
           list="search"
@@ -35,17 +35,7 @@ const Search = (props: IProps) => {
         <br />
         <button className="search-items search-button">search by name</button>
       </form>
-      <form className="search-form" onSubmit={handleSubmit}>
-        <select
-          className="search-items"
-          name="order"
-          defaultValue={order}
-          onChange={props.handleOnChange}
-        >
-          <option value={SortingOrder.ASC}>direct sort</option>
-          <option value={SortingOrder.DESC}>reverse sort</option>
-        </select>
-        <hr />
+      <form className={styles.searchForm} onSubmit={handleSubmit}>
         <select
           className="search-items"
           name="sort"
@@ -55,6 +45,16 @@ const Search = (props: IProps) => {
           <option value={SortingValues.DEFAULT}>unsorted by value</option>
           <option value={SortingValues.NAME}>sort by name</option>
           <option value={SortingValues.RACE}>sort by race</option>
+        </select>
+        <hr />
+        <select
+          className="search-items"
+          name="order"
+          defaultValue={order}
+          onChange={props.handleOnChange}
+        >
+          <option value={SortingOrder.ASC}>direct sort</option>
+          <option value={SortingOrder.DESC}>reverse sort</option>
         </select>
         <hr />
         <select
@@ -70,7 +70,7 @@ const Search = (props: IProps) => {
         <hr />
         <button className="search-items search-button">sort list</button>
       </form>
-      <form className="search-form" onSubmit={handleSubmit}>
+      <form className={styles.searchForm} onSubmit={handleSubmit}>
         <label htmlFor="">
           <input
             className="search-items"

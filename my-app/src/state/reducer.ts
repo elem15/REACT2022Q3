@@ -75,11 +75,13 @@ export const reducer = (mainState: IMainState, action: IAction) => {
       return { ...mainState, state: action.payload };
     case ActionKind.CHANGE_PAGE:
       return { ...mainState, state: { ...mainState.state, page: action.payload, loading: true } };
-    case ActionKind.CHANGE_SEARCH_VALUE:
+    case ActionKind.CHANGE_SEARCH_VALUE: {
+      const { key, value } = action.payload;
       return {
         ...mainState,
-        state: { ...mainState.state, [action.payload.key]: action.payload.value },
+        state: { ...mainState.state, [key]: value },
       };
+    }
     default:
       return mainState;
   }

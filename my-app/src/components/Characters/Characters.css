@@ -30,19 +30,17 @@
   background-color: rgba(117, 190, 218, 0.7);
 }
 .modal-window {
-  width: 500px;
+  width: 70%;
+  height: 40rem;
   background-color: darkgray;
   border-radius: 5px;
-  padding: 20px 20px;  
+  padding: 20px 2em;  
   position: relative;
+  font-size: 1.5rem;
 }
-.close-button {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  background-color: rgba(117, 190, 218, 0);
-  border: none;
-  cursor: pointer;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
 }
 .nothing-message {
   text-align: center;

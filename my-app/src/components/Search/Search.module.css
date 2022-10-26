@@ -1,17 +1,17 @@
-.search-section {
+.searchSection {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   padding: 2em 3em;
   margin: 1em 1em;
   background-color: aqua;
   border-radius: 5px;
-  gap: 1em 1em;
+  gap: 4em 8em;
 }
 
-.search-form {
+.searchForm {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
 }
 
