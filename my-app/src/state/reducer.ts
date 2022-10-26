@@ -28,7 +28,7 @@ interface IChangePageAction {
 }
 interface IChangeSearchValueAction {
   type: ActionKind.CHANGE_SEARCH_VALUE;
-  payload: { key: keyof IState; value: string };
+  payload: { key: keyof IState; value: string | number };
 }
 interface ICardAction {
   type: ActionKind.ADD_CARD;
@@ -52,6 +52,8 @@ export const mainState: IMainState = {
     searchValue: '',
     page: 1,
     pages: 0,
+    total: 0,
+    limit: 10,
     mode: Mode.LIST,
     modalMode: false,
     modalDoc: null,

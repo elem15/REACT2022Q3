@@ -17,6 +17,7 @@ export interface IDataLoad {
   error: boolean;
   pages?: number;
   mode: Mode;
+  total?: number;
 }
 export interface IErrorData {
   message: string;
@@ -24,6 +25,7 @@ export interface IErrorData {
 }
 export interface ILoadCharactersArgs {
   page: number;
+  limit: number;
   order: string;
   sort: string;
   gender: string;
@@ -36,9 +38,7 @@ export const loadCharacters = async (args: ILoadCharactersArgs) => {
     .join('&');
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?limit=20${query}${
-        sort && `&sort=${sort}:${order}`
-      }`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${sort && `&sort=${sort}:${order}`}`,
       {
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,14 @@ export const loadCharacters = async (args: ILoadCharactersArgs) => {
       }
     );
     const { data } = response;
-    return { docs: data.docs, loading: false, pages: data.pages, error: false, mode: Mode.LIST };
+    return {
+      docs: data.docs,
+      loading: false,
+      pages: data.pages,
+      error: false,
+      mode: Mode.LIST,
+      total: data.total,
+    };
   } catch (e) {
     const error = e as AxiosError;
     const data = error.response?.data as IErrorData;

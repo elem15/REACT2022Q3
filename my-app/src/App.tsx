@@ -29,18 +29,20 @@ function App() {
     resolver: yupResolver(schema),
   });
   useEffect(() => {
-    const { order, sort, gender } = mainState.state;
+    const { order, sort, gender, limit } = mainState.state;
     const handleDataLoad = async (page: number) => {
-      const { docs, loading, pages, error, errorMessage } = await loadCharacters({
+      const { docs, loading, pages, error, errorMessage, total } = await loadCharacters({
         page,
         order,
         sort,
         gender,
+        limit,
       });
       dispatch({
         type: ActionKind.LOAD_CHARACTERS_STATE,
         payload: {
           ...mainState.state,
+          total,
           loading,
           pages: pages || mainState.state.pages,
           error,

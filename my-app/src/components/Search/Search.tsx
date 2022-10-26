@@ -11,7 +11,7 @@ interface IProps {
 }
 
 const Search = (props: IProps) => {
-  const { searchValue, gender, sort, order } = props.state;
+  const { searchValue, gender, sort, order, page, limit, pages } = props.state;
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     props.handleToListMode();
@@ -69,6 +69,52 @@ const Search = (props: IProps) => {
         </select>
         <hr />
         <button className="search-items search-button">sort list</button>
+      </form>
+      <form className="search-form" onSubmit={handleSubmit}>
+        <label htmlFor="">
+          <input
+            className="search-items"
+            name="page"
+            type="number"
+            autoComplete="off"
+            min="1"
+            max={pages}
+            value={page}
+            onChange={props.handleOnChange}
+          />
+          <br />
+          current page
+        </label>
+        <hr />
+        <label htmlFor="">
+          <input
+            className="search-items"
+            name="limit"
+            type="number"
+            autoComplete="off"
+            min="1"
+            max="50"
+            value={limit}
+            onChange={props.handleOnChange}
+          />
+          <br />
+          characters per page
+        </label>
+        <hr />
+        <label htmlFor="">
+          <input
+            className="search-items"
+            name="pages"
+            type="number"
+            autoComplete="off"
+            min="1"
+            max="50"
+            value={pages}
+            onChange={props.handleOnChange}
+          />
+          <br />
+          total pages
+        </label>
       </form>
     </section>
   );

@@ -26,7 +26,7 @@ export interface ICharacter {
 }
 export interface IDocs {
   docs: ICharacter[];
-  total: number;
+  total?: number;
   limit: number;
   page: number;
   pages: number;
@@ -42,6 +42,8 @@ export interface IState {
   searchValue: string;
   page: number;
   pages: number;
+  total?: number;
+  limit: number;
   mode: Mode;
   modalMode: boolean;
   modalDoc: ICharacter | null;
@@ -57,22 +59,25 @@ interface IProps {
 
 const Main = (props: IProps) => {
   const { mainState, dispatch } = useContext(MainStateContext);
-  const { page, mode, loading, searchValue, gender, sort, order } = mainState.state;
+  const { page, mode, loading, searchValue, gender, sort, order, limit, total, pages } =
+    mainState.state;
   const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
     if (mode === Mode.LIST && loading === true) {
       const handleDataLoad = async (page: number) => {
-        const { docs, loading, pages, error, mode, errorMessage } = await loadCharacters({
+        const { docs, loading, pages, error, mode, errorMessage, total } = await loadCharacters({
           page,
           gender,
           sort,
           order,
+          limit,
         });
         dispatch({
           type: ActionKind.LOAD_CHARACTERS_STATE,
           payload: {
             ...mainState.state,
             loading,
+            total,
             pages: pages || mainState.state.pages,
             error,
             mode,
@@ -84,7 +89,7 @@ const Main = (props: IProps) => {
       };
       handleDataLoad(page);
     }
-  }, [page, mode, loadCharacters, dispatch, loading, mainState.state, gender, sort, order]);
+  }, [page, mode, loadCharacters, dispatch, loading, mainState.state, limit, gender, sort, order]);
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
@@ -121,7 +126,27 @@ const Main = (props: IProps) => {
   const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { value, name } = e.target as HTMLInputElement;
     const key = name as keyof IState;
-    dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: { key, value } });
+    if (key === 'pages' && total) {
+      const newLimit = Math.ceil(total / +value);
+      dispatch({
+        type: ActionKind.CHANGE_SEARCH_VALUE,
+        payload: { key: 'limit', value: newLimit },
+      });
+    }
+    if (key === 'limit' && total) {
+      const newTotalPages = Math.ceil(total / +value);
+      dispatch({
+        type: ActionKind.CHANGE_SEARCH_VALUE,
+        payload: { key: 'pages', value: newTotalPages },
+      });
+    }
+    const newValue = +value ? +value : value;
+    if (key === 'page') {
+      const page = newValue <= pages ? newValue : pages;
+      dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: { key, value: page } });
+      return;
+    }
+    dispatch({ type: ActionKind.CHANGE_SEARCH_VALUE, payload: { key, value: newValue } });
   };
   const handleOnSubmit = (e: FormEvent) => {
     e.preventDefault();
