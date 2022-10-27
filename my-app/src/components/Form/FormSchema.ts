@@ -4,7 +4,10 @@ export const schema = yup
   .object()
   .shape({
     address: yup.string().required().min(8, 'address must be more than 8 characters'),
-    price: yup.number().required().min(10000, 'min cost 10000 $'),
+    price: yup
+      .number()
+      .required({ msg: 'price must be a `number`' })
+      .min(10000, 'min cost 10000 $'),
     date: yup
       .date()
       .required()

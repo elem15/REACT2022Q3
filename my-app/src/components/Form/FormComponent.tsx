@@ -13,7 +13,7 @@ const FormComponent = (props: IFormComponentProps) => {
 
   if (handleSubmit && register && errors) {
     return (
-      <div>
+      <div className="wrapper">
         <div className="section">
           <form action="" onSubmit={handleSubmit(props.submitForm)}>
             <label htmlFor="">

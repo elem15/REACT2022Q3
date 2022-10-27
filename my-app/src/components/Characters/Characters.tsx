@@ -45,7 +45,9 @@ const Characters = (props: IProps) => {
       )}
       {props.mode === Mode.SEARCH && (
         <div className="pagination">
-          <button onClick={props.handleToListMode}>GO TO LIST</button>
+          <button onClick={props.handleToListMode} className="search-items search-button">
+            GO TO LIST
+          </button>
         </div>
       )}
     </div>

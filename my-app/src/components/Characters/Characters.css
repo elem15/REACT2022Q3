@@ -27,11 +27,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(117, 190, 218, 0.7);
+  z-index: -1;
 }
 .modal-window {
+  position: fixed;
+  margin: 0 auto;
   width: 70%;
-  height: 40rem;
+  height: 43rem;
   background-color: darkgray;
   border-radius: 5px;
   padding: 20px 2em;  
