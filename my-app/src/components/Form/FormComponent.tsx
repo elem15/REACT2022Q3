@@ -2,15 +2,15 @@ import Cards from 'components/Cards/Cards';
 import React, { useContext } from 'react';
 import { FieldValues } from 'react-hook-form/dist/types';
 import './Form.css';
-import { FormContext, MainStateContext } from 'state/context';
+import { FormContext } from 'state/context';
+import { useAppSelector } from 'redux/hooks';
 
 interface IFormComponentProps {
   submitForm: (data: FieldValues) => void;
 }
 const FormComponent = (props: IFormComponentProps) => {
   const { register, handleSubmit, errors } = useContext(FormContext);
-  const { mainState } = useContext(MainStateContext);
-
+  const cards = useAppSelector((state) => state.cards.cards);
   if (handleSubmit && register && errors) {
     return (
       <div className="wrapper">
@@ -71,7 +71,7 @@ const FormComponent = (props: IFormComponentProps) => {
             </button>
           </form>
         </div>
-        {mainState.cards.length ? <Cards data={mainState.cards} /> : ''}
+        {cards.length ? <Cards data={cards} /> : ''}
       </div>
     );
   }
