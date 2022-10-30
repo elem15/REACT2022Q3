@@ -13,8 +13,10 @@ import { useForm } from 'react-hook-form';
 import { mainState, reducer } from 'state/reducer';
 import { FormContext, IFormContext, MainStateContext } from 'state/context';
 import { schema } from 'components/Form/FormSchema';
-import { ActionKind } from 'helpers/constants/actions';
+// import { ActionKind } from 'helpers/constants/actions';
 import Detail from 'components/Characters/CharacterDetail';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { addCharacters, loadCharactersState } from 'redux/mainSlice';
 
 const timers = {
   timeout: null as NodeJS.Timeout | null,
@@ -22,6 +24,8 @@ const timers = {
 
 function App() {
   const [reducerMainState, dispatch] = useReducer(reducer, mainState);
+  const state = useAppSelector((state) => state.main.state);
+  const appDispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -30,30 +34,43 @@ function App() {
     resolver: yupResolver(schema),
   });
   useEffect(() => {
-    const { order, sort, gender, limit } = mainState.state;
-    const handleDataLoad = async (page: number) => {
+    const { order, sort, gender, limit } = state;
+    const handleDataLoad = async () => {
       const { docs, loading, pages, error, errorMessage, total } = await loadCharacters({
-        page,
+        page: 1,
         order,
         sort,
         gender,
         limit,
       });
-      dispatch({
-        type: ActionKind.LOAD_CHARACTERS_STATE,
-        payload: {
-          ...mainState.state,
+      // dispatch({
+      //   type: ActionKind.LOAD_CHARACTERS_STATE,
+      //   payload: {
+      //     ...mainState.state,
+      //     total,
+      //     loading,
+      //     pages: pages || mainState.state.pages,
+      //     error,
+      //     searchValue: localStorage.getItem('searchValue') || '',
+      //     errorMessage: errorMessage || undefined,
+      //   },
+      // });
+      // dispatch({ type: ActionKind.ADD_CHARACTERS, payload: docs });
+      appDispatch(
+        loadCharactersState({
+          ...state,
           total,
           loading,
           pages: pages || mainState.state.pages,
           error,
           searchValue: localStorage.getItem('searchValue') || '',
           errorMessage: errorMessage || undefined,
-        },
-      });
-      dispatch({ type: ActionKind.ADD_CHARACTERS, payload: docs });
+        })
+      );
+      appDispatch(addCharacters(docs));
     };
-    handleDataLoad(1);
+    handleDataLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <MainStateContext.Provider value={{ mainState: reducerMainState, dispatch }}>

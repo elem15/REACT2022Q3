@@ -1,11 +1,13 @@
 import { routes } from 'helpers/constants/routes';
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MainStateContext } from 'state/context';
+import { useAppSelector } from 'redux/hooks';
 
 const Detail = () => {
-  const { mainState } = useContext(MainStateContext);
-  const { modalDoc, page } = mainState.state;
+  // const { mainState } = useContext(MainStateContext);
+  // const { modalDoc, page } = mainState.state;
+  const state = useAppSelector((state) => state.main.state);
+  const { modalDoc, page } = state;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,7 +20,7 @@ const Detail = () => {
     <div className="modal">
       <div className="modal-window">
         <div className="modal-header">
-          <span>page №{page}</span>
+          <span>character from page №{page}</span>
           <Link to={routes.BASE_URL}>back to Main page</Link>
         </div>
         <h1>Character&apos;s detail</h1>

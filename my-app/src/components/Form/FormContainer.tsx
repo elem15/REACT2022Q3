@@ -1,11 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ICard } from 'components/Cards/Cards';
 import './Form.css';
 import FormComponent from './FormComponent';
 import { FieldValues } from 'react-hook-form';
-import { MainStateContext } from 'state/context';
-import { ActionKind } from 'helpers/constants/actions';
 import { useAppDispatch } from 'redux/hooks';
 import { addCard } from 'redux/cardsSlice';
 
@@ -22,25 +19,10 @@ export interface IForm {
 }
 
 const FormPageContainer = () => {
-  const { dispatch } = useContext(MainStateContext);
   const appDispatch = useAppDispatch();
   const submitForm = (formData: FieldValues) => {
     const { address, date, price, houseType, sold, isUrgent, files } = formData as IForm;
     const picture = files != null && files[0] ? URL.createObjectURL(files[0]) : '';
-    dispatch({
-      type: ActionKind.ADD_CARD,
-      payload: {
-        id: uuidv4(),
-        houseType,
-        isUrgent,
-        isActive: !sold,
-        address,
-        date: date.toLocaleDateString(),
-        picture,
-        price,
-        about: '',
-      } as ICard,
-    });
     appDispatch(
       addCard({
         id: uuidv4(),

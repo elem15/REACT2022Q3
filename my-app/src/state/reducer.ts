@@ -7,7 +7,6 @@ import { ActionKind } from '../helpers/constants/actions';
 interface IMainState {
   names: IName[];
   docs: ICharacter[];
-  cards: ICard[];
   state: IState;
 }
 interface INamesAction {
@@ -44,7 +43,6 @@ export type IAction =
 export const mainState: IMainState = {
   names: [],
   docs: [],
-  cards: [],
   state: {
     loading: true,
     error: false,
@@ -69,8 +67,6 @@ export const reducer = (mainState: IMainState, action: IAction) => {
       return { ...mainState, names: action.payload };
     case ActionKind.ADD_CHARACTERS:
       return { ...mainState, docs: action.payload };
-    case ActionKind.ADD_CARD:
-      return { ...mainState, cards: [...mainState.cards, action.payload] };
     case ActionKind.LOAD_CHARACTERS_STATE:
       return { ...mainState, state: action.payload };
     case ActionKind.CHANGE_PAGE:
