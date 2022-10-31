@@ -26,11 +26,11 @@ const initialState: IMainState = {
     total: 0,
     limit: 10,
     mode: Mode.LIST,
-    modalMode: false,
     modalDoc: null,
     order: SortingOrder.ASC,
     sort: SortingValues.DEFAULT,
     gender: GenderType.DEFAULT,
+    timer: null,
   },
 };
 
@@ -51,14 +51,84 @@ export const mainSlice = createSlice({
       state.state.page = action.payload;
       state.state.loading = true;
     },
-    changeSearchParams: (state, action: PayloadAction<ISearchParams>) => {
+    setSearchParams: (state, action: PayloadAction<ISearchParams>) => {
       const { key, value } = action.payload;
-      state.state = { ...state.state, [key]: value };
+      const { total, pages } = state.state;
+      if (key === 'pages' && total) {
+        const newLimit = Math.ceil(total / +value);
+        state.state.limit = newLimit > 50 ? 50 : newLimit;
+        state.state.pages = newLimit > 50 ? Math.ceil(total / 50) : +value;
+      } else if (key === 'limit' && total) {
+        const newTotalPages = Math.ceil(total / +value);
+        state.state.pages = newTotalPages > 200 ? 200 : newTotalPages;
+        state.state.limit = newTotalPages > 200 ? Math.ceil(total / 200) : +value;
+      } else if (key === 'page') {
+        const newValue = +value && +value;
+        state.state.page = newValue <= pages ? newValue : pages;
+      } else {
+        state.state = { ...state.state, [key]: +value ? +value : value };
+      }
+    },
+    enableSearchMode: (state) => {
+      state.state.loading = true;
+      state.state.mode = Mode.SEARCH;
+    },
+    enableListMode: (state) => {
+      state.state.loading = true;
+      state.state.mode = Mode.LIST;
+    },
+    goToNextPage: (state) => {
+      if (state.state.page < state.state.pages) {
+        state.state.page += 1;
+        state.state.loading = true;
+      }
+    },
+    goToLastPage: (state) => {
+      if (state.state.page < state.state.pages) {
+        state.state.page = state.state.pages;
+        state.state.loading = true;
+      }
+    },
+    goToPrevPage: (state) => {
+      if (state.state.page > 1) {
+        state.state.page -= 1;
+        state.state.loading = true;
+      }
+    },
+    goToFirstPage: (state) => {
+      if (state.state.page > 1) {
+        state.state.page = 1;
+        state.state.loading = true;
+      }
+    },
+    createDetailPage: (state, action) => {
+      state.state.modalDoc = state.docs.find((item) => item._id === action.payload) || null;
+    },
+    removeTimer: (state) => {
+      const { timer } = state.state;
+      if (timer) clearTimeout(timer);
+    },
+    setNewTimer: (state, action) => {
+      state.state.timer = action.payload;
     },
   },
 });
 
-export const { addNames, addCharacters, loadCharactersState, changePage, changeSearchParams } =
-  mainSlice.actions;
+export const {
+  addNames,
+  addCharacters,
+  loadCharactersState,
+  changePage,
+  enableSearchMode,
+  goToNextPage,
+  goToPrevPage,
+  goToFirstPage,
+  goToLastPage,
+  enableListMode,
+  createDetailPage,
+  setSearchParams,
+  removeTimer,
+  setNewTimer,
+} = mainSlice.actions;
 
 export default mainSlice.reducer;

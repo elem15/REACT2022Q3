@@ -1,4 +1,8 @@
+import { routes } from 'helpers/constants/routes';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from 'redux/hooks';
+import { createDetailPage } from 'redux/mainSlice';
 import './Characters.css';
 
 interface IProps {
@@ -6,11 +10,16 @@ interface IProps {
   name: string;
   race: string;
   birth: string;
-  handleCreateModal: (id: string) => void;
 }
 const Character = (props: IProps) => {
+  const appDispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const handleCreateModal = (id: string) => {
+    appDispatch(createDetailPage(id));
+    navigate(routes.DETAIL, { replace: false });
+  };
   return (
-    <div className="card" onClick={() => props.handleCreateModal(props.id)}>
+    <div className="card" onClick={() => handleCreateModal(props.id)}>
       <div>
         race: <strong>{props.race}</strong>
       </div>

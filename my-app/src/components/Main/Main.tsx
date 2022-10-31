@@ -1,22 +1,14 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { FormEvent, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import './Main.css';
 import { IDataLoad, IDataSearch, ILoadCharactersArgs } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
-import { useNavigate } from 'react-router-dom';
-import { routes } from 'helpers/constants/routes';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  addCharacters,
-  addNames,
-  changePage,
-  changeSearchParams,
-  loadCharactersState,
-} from 'redux/mainSlice';
+import { addCharacters, addNames, loadCharactersState } from 'redux/mainSlice';
 
 export interface ICharacter {
   _id: string;
@@ -52,11 +44,11 @@ export interface IState {
   total?: number;
   limit: number;
   mode: Mode;
-  modalMode: boolean;
   modalDoc: ICharacter | null;
   order: SortingOrder;
   sort: SortingValues;
   gender: GenderType;
+  timer: NodeJS.Timeout | null;
 }
 interface IProps {
   timers: { timeout: NodeJS.Timeout | null };
@@ -66,10 +58,8 @@ interface IProps {
 
 const Main = (props: IProps) => {
   const appDispatch = useAppDispatch();
-  const state = useAppSelector((state) => state.main.state);
-  const docs = useAppSelector((state) => state.main.docs);
-  const names = useAppSelector((state) => state.main.names);
-  const { page, mode, loading, searchValue, gender, sort, order, limit, total, pages } = state;
+  const { state } = useAppSelector((state) => state.main);
+  const { page, mode, loading, searchValue, gender, sort, order, limit } = state;
   const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
     if (mode === Mode.LIST && loading === true) {
@@ -121,96 +111,41 @@ const Main = (props: IProps) => {
     const handleNamesLoad = async (value: string) => {
       if (timers.timeout) clearTimeout(timers.timeout);
       timers.timeout = setTimeout(async () => {
-        localStorage.setItem('searchValue', value);
         const data = await props.searchCharacters(value);
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
         appDispatch(addNames(names));
       }, 1000);
+      // appDispatch(removeTimer());
+      // appDispatch(
+      //   setNewTimer(
+      //     setTimeout(async () => {
+      //       const data = await props.searchCharacters(value);
+      //       const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
+      //       appDispatch(addNames(names));
+      //     }, 1000)
+      //   )
+      // );
+      // const setTimer = () => {
+      //   timers.timeout = setTimeout(() => {
+      //     localStorage.setItem('searchValue', searchValue);
+      //   });
+      // };
+      // if (timers.timeout) clearTimeout(timers.timeout);
+      // await new Promise((res) => {
+      //   res(setTimer());
+      // });
+      // localStorage.setItem('searchValue', searchValue);
+      // const data = await props.searchCharacters(value);
+      // const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
+      // appDispatch(addNames(names));
     };
-    handleNamesLoad(state.searchValue);
-  }, [appDispatch, props, searchValue, state.searchValue, timers]);
-  const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { value, name } = e.target as HTMLInputElement;
-    const key = name as keyof IState;
-    if (key === 'pages' && total) {
-      const newLimit = Math.ceil(total / +value);
-      appDispatch(changeSearchParams({ key: 'limit', value: newLimit }));
-    }
-    if (key === 'limit' && total) {
-      const newTotalPages = Math.ceil(total / +value);
-      appDispatch(changeSearchParams({ key: 'pages', value: newTotalPages }));
-    }
-    const newValue = +value ? +value : value;
-    if (key === 'page') {
-      const page = newValue <= pages ? newValue : pages;
-      appDispatch(changeSearchParams({ key, value: page }));
-      return;
-    }
-    appDispatch(changeSearchParams({ key, value: newValue }));
-  };
-  const handleOnSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    appDispatch(
-      loadCharactersState({
-        ...state,
-        loading: true,
-        mode: Mode.SEARCH,
-      })
-    );
-  };
-  const handleDataNext = () => {
-    if (state.page < state.pages) {
-      const page = state.page + 1;
-      appDispatch(changePage(page));
-    }
-  };
-  const handleDataPrev = () => {
-    if (state.page > 1) {
-      const page = state.page - 1;
-      appDispatch(changePage(page));
-    }
-  };
-  const handleDataEnd = () => {
-    if (state.page < state.pages) {
-      appDispatch(changePage(state.pages));
-    }
-  };
-  const handleDataBegin = () => {
-    if (state.page > 1) {
-      appDispatch(changePage(1));
-    }
-  };
-  const handleToListMode = async () => {
-    appDispatch(
-      loadCharactersState({
-        ...state,
-        loading: true,
-        mode: Mode.LIST,
-      })
-    );
-  };
-  const navigate = useNavigate();
-  const handleCreateModal = (id: string) => {
-    const modalDoc = docs.find((item) => item._id === id) || null;
-    appDispatch(
-      loadCharactersState({
-        ...state,
-        modalMode: true,
-        modalDoc,
-      })
-    );
-    navigate(routes.DETAIL, { replace: false });
-  };
+    handleNamesLoad(searchValue);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchValue]);
   return (
     <div className="App">
       <h1>The Lord of the Rings - search characters</h1>
-      <Search
-        names={names}
-        state={state}
-        handleOnChange={handleOnChange}
-        handleOnSubmit={handleOnSubmit}
-        handleToListMode={handleToListMode}
-      />
+      <Search />
       {state.loading ? (
         <div className="preloader">
           <Preloader />
@@ -218,17 +153,7 @@ const Main = (props: IProps) => {
       ) : state.error ? (
         <NetworkError message={state.errorMessage} />
       ) : (
-        <Characters
-          docs={docs}
-          page={state.page}
-          mode={state.mode}
-          handleDataNext={handleDataNext}
-          handleDataPrev={handleDataPrev}
-          handleDataEnd={handleDataEnd}
-          handleDataBegin={handleDataBegin}
-          handleToListMode={handleToListMode}
-          handleCreateModal={handleCreateModal}
-        />
+        <Characters />
       )}
     </div>
   );

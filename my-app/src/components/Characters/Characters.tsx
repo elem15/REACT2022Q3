@@ -1,51 +1,46 @@
-import { ICharacter } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import React from 'react';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { enableListMode, goToFirstPage, goToLastPage, goToNextPage } from 'redux/mainSlice';
 import Character from './Character';
 import './Characters.css';
 
-interface IProps {
-  docs: ICharacter[];
-  page: number;
-  mode: Mode;
-  handleDataNext: () => void;
-  handleDataPrev: () => void;
-  handleDataEnd: () => void;
-  handleDataBegin: () => void;
-  handleToListMode: () => void;
-  handleCreateModal: (id: string) => void;
-}
-const Characters = (props: IProps) => {
+const Characters = () => {
+  const { docs, state } = useAppSelector((state) => state.main);
+  const { mode, page } = state;
+  const appDispatch = useAppDispatch();
   return (
     <div>
-      {props.docs.length ? (
+      {docs.length ? (
         <div className="cards-character">
-          {props.docs.map((value) => (
+          {docs.map((value) => (
             <Character
               key={value._id}
               id={value._id}
               name={value.name}
               race={value.race}
               birth={value.birth}
-              handleCreateModal={props.handleCreateModal}
             />
           ))}
         </div>
       ) : (
         <div className="nothing-message">Nothing found</div>
       )}
-      {props.mode === Mode.LIST && (
+      {mode === Mode.LIST && (
         <div className="pagination">
-          <button onClick={props.handleDataBegin}>{'<<'}</button>&nbsp;
-          <button onClick={props.handleDataPrev}>{'<'}</button>&nbsp;
-          <span>{props.page}</span>&nbsp;
-          <button onClick={props.handleDataNext}>{'>'}</button>&nbsp;
-          <button onClick={props.handleDataEnd}>{'>>'}</button>
+          <button onClick={() => appDispatch(goToFirstPage())}>{'<<'}</button>&nbsp;
+          <button onClick={() => appDispatch(goToFirstPage())}>{'<'}</button>&nbsp;
+          <span>{page}</span>&nbsp;
+          <button onClick={() => appDispatch(goToNextPage())}>{'>'}</button>&nbsp;
+          <button onClick={() => appDispatch(goToLastPage())}>{'>>'}</button>
         </div>
       )}
-      {props.mode === Mode.SEARCH && (
+      {mode === Mode.SEARCH && (
         <div className="pagination">
-          <button onClick={props.handleToListMode} className="search-items search-button">
+          <button
+            onClick={() => appDispatch(enableListMode())}
+            className="search-items search-button"
+          >
             GO TO LIST
           </button>
         </div>

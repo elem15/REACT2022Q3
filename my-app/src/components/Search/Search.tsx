@@ -1,24 +1,30 @@
-import { IName, IState } from 'components/Main/Main';
+import { IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import React, { FormEvent } from 'react';
+import { useAppDispatch, useAppSelector } from 'redux/hooks';
+import { enableListMode, enableSearchMode, setSearchParams } from 'redux/mainSlice';
 import styles from './Search.module.css';
-interface IProps {
-  state: IState;
-  names: IName[];
-  handleOnChange: (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => void;
-  handleOnSubmit: (e: FormEvent) => void;
-  handleToListMode: () => void;
-}
 
-const Search = (props: IProps) => {
-  const { searchValue, gender, sort, order, page, limit, pages } = props.state;
-  const handleSubmit = (e: FormEvent) => {
+const Search = () => {
+  const appDispatch = useAppDispatch();
+  const { names, state } = useAppSelector((state) => state.main);
+  const { searchValue, gender, sort, order, page, limit, pages } = state;
+  const handleSortSubmit = (e: FormEvent) => {
     e.preventDefault();
-    props.handleToListMode();
+    appDispatch(enableListMode());
+  };
+  const handleSearchSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    appDispatch(enableSearchMode());
+  };
+  const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { value, name } = e.target as HTMLInputElement;
+    const key = name as keyof IState;
+    appDispatch(setSearchParams({ value, key }));
   };
   return (
     <section className={styles.searchSection}>
-      <form className={styles.searchForm} onSubmit={props.handleOnSubmit}>
+      <form className={styles.searchForm} onSubmit={handleSearchSubmit}>
         <input
           className="search-items"
           list="search"
@@ -27,21 +33,16 @@ const Search = (props: IProps) => {
           autoComplete="off"
           placeholder="character's name"
           value={searchValue}
-          onChange={props.handleOnChange}
+          onChange={handleOnChange}
         />
         <datalist id="search">
-          {props.names.map(({ name, id }, idx) => idx < 10 && <option key={id} value={name} />)}
+          {names.map(({ name, id }, idx) => idx < 10 && <option key={id} value={name} />)}
         </datalist>
         <br />
         <button className="search-items search-button">search by name</button>
       </form>
-      <form className={styles.searchForm} onSubmit={handleSubmit}>
-        <select
-          className="search-items"
-          name="sort"
-          defaultValue={sort}
-          onChange={props.handleOnChange}
-        >
+      <form className={styles.searchForm} onSubmit={handleSortSubmit}>
+        <select className="search-items" name="sort" defaultValue={sort} onChange={handleOnChange}>
           <option value={SortingValues.DEFAULT}>unsorted by value</option>
           <option value={SortingValues.NAME}>sort by name</option>
           <option value={SortingValues.RACE}>sort by race</option>
@@ -51,7 +52,7 @@ const Search = (props: IProps) => {
           className="search-items"
           name="order"
           defaultValue={order}
-          onChange={props.handleOnChange}
+          onChange={handleOnChange}
         >
           <option value={SortingOrder.ASC}>direct sort</option>
           <option value={SortingOrder.DESC}>reverse sort</option>
@@ -61,7 +62,7 @@ const Search = (props: IProps) => {
           className="search-items"
           name="gender"
           defaultValue={gender}
-          onChange={props.handleOnChange}
+          onChange={handleOnChange}
         >
           <option value={GenderType.DEFAULT}>unselected by gender</option>
           <option value={GenderType.MALE}>male</option>
@@ -70,7 +71,7 @@ const Search = (props: IProps) => {
         <hr />
         <button className="search-items search-button">sort list</button>
       </form>
-      <form className={styles.searchForm} onSubmit={handleSubmit}>
+      <form className={styles.searchForm}>
         <label htmlFor="">
           <input
             className="search-items"
@@ -80,7 +81,7 @@ const Search = (props: IProps) => {
             min="1"
             max={pages}
             value={page}
-            onChange={props.handleOnChange}
+            onChange={handleOnChange}
           />
           <br />
           current page
@@ -92,10 +93,10 @@ const Search = (props: IProps) => {
             name="limit"
             type="number"
             autoComplete="off"
-            min="1"
+            min="5"
             max="50"
             value={limit}
-            onChange={props.handleOnChange}
+            onChange={handleOnChange}
           />
           <br />
           characters per page
@@ -108,9 +109,9 @@ const Search = (props: IProps) => {
             type="number"
             autoComplete="off"
             min="1"
-            max="50"
+            max="200"
             value={pages}
-            onChange={props.handleOnChange}
+            onChange={handleOnChange}
           />
           <br />
           total pages
