@@ -69,7 +69,7 @@ const Search = () => {
           <option value={GenderType.FEMALE}>female</option>
         </select>
         <hr />
-        <button className="search-items search-button">sort list</button>
+        <button className="search-items search-button">sorting search</button>
       </form>
       <form className={styles.searchForm}>
         <label htmlFor="">

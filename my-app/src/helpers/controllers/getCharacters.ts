@@ -30,16 +30,21 @@ export interface ILoadCharactersArgs {
   order: string;
   sort: string;
   gender: string;
+  searchValue: string;
 }
 export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLoad> => {
-  const { order, sort } = args;
+  const { order, sort, searchValue } = args;
+  const bracketIndex = searchValue.indexOf('(');
+  const correctName = bracketIndex > -1 ? searchValue.slice(0, bracketIndex) : searchValue;
+  const name = new RegExp(correctName, 'i');
   const query = Object.entries(args)
-    .filter(([key, value]) => key !== 'sort' && key !== 'order' && value)
+    .filter(([key, value]) => key !== 'sort' && key !== 'order' && key !== 'searchValue' && value)
     .map(([key, value]) => `${key}=${value}`)
     .join('&');
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${sort && `&sort=${sort}:${order}`}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${sort && `&sort=${sort}:${order}`}
+        ${searchValue.length && `&name=${name}`}`,
       {
         headers: {
           'Content-Type': 'application/json',

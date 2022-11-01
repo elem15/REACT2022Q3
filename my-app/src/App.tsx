@@ -39,6 +39,7 @@ function App() {
         sort,
         gender,
         limit,
+        searchValue: '',
       });
       appDispatch(
         loadCharactersState({

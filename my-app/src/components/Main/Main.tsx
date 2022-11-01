@@ -66,6 +66,7 @@ const Main = (props: IProps) => {
       const handleDataLoad = async (setPage: number) => {
         const { docs, loading, pages, error, mode, errorMessage, total, page } =
           await loadCharacters({
+            searchValue,
             page: setPage,
             gender,
             sort,
@@ -81,7 +82,6 @@ const Main = (props: IProps) => {
             pages: pages || state.pages,
             error,
             mode,
-            searchValue: '',
             errorMessage: errorMessage || undefined,
           })
         );
@@ -89,7 +89,19 @@ const Main = (props: IProps) => {
       };
       handleDataLoad(page);
     }
-  }, [page, mode, loadCharacters, loading, limit, gender, sort, order, appDispatch, state]);
+  }, [
+    page,
+    mode,
+    loadCharacters,
+    loading,
+    limit,
+    gender,
+    sort,
+    order,
+    appDispatch,
+    state,
+    searchValue,
+  ]);
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
@@ -118,29 +130,6 @@ const Main = (props: IProps) => {
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
         appDispatch(addNames(names));
       }, 1000);
-      // appDispatch(removeTimer());
-      // appDispatch(
-      //   setNewTimer(
-      //     setTimeout(async () => {
-      //       const data = await props.searchCharacters(value);
-      //       const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-      //       appDispatch(addNames(names));
-      //     }, 1000)
-      //   )
-      // );
-      // const setTimer = () => {
-      //   timers.timeout = setTimeout(() => {
-      //     localStorage.setItem('searchValue', searchValue);
-      //   });
-      // };
-      // if (timers.timeout) clearTimeout(timers.timeout);
-      // await new Promise((res) => {
-      //   res(setTimer());
-      // });
-      // localStorage.setItem('searchValue', searchValue);
-      // const data = await props.searchCharacters(value);
-      // const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-      // appDispatch(addNames(names));
     };
     handleNamesLoad(searchValue);
     // eslint-disable-next-line react-hooks/exhaustive-deps
