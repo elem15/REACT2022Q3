@@ -1,7 +1,13 @@
 import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { enableListMode, goToFirstPage, goToLastPage, goToNextPage } from 'redux/mainSlice';
+import {
+  enableListMode,
+  goToFirstPage,
+  goToLastPage,
+  goToNextPage,
+  goToPrevPage,
+} from 'redux/mainSlice';
 import Character from './Character';
 import './Characters.css';
 
@@ -29,7 +35,7 @@ const Characters = () => {
       {mode === Mode.LIST && (
         <div className="pagination">
           <button onClick={() => appDispatch(goToFirstPage())}>{'<<'}</button>&nbsp;
-          <button onClick={() => appDispatch(goToFirstPage())}>{'<'}</button>&nbsp;
+          <button onClick={() => appDispatch(goToPrevPage())}>{'<'}</button>&nbsp;
           <span>{page}</span>&nbsp;
           <button onClick={() => appDispatch(goToNextPage())}>{'>'}</button>&nbsp;
           <button onClick={() => appDispatch(goToLastPage())}>{'>>'}</button>

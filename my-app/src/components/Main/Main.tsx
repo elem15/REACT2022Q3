@@ -63,17 +63,19 @@ const Main = (props: IProps) => {
   const { timers, searchCharacters, loadCharacters } = props;
   useEffect(() => {
     if (mode === Mode.LIST && loading === true) {
-      const handleDataLoad = async (page: number) => {
-        const { docs, loading, pages, error, mode, errorMessage, total } = await loadCharacters({
-          page,
-          gender,
-          sort,
-          order,
-          limit,
-        });
+      const handleDataLoad = async (setPage: number) => {
+        const { docs, loading, pages, error, mode, errorMessage, total, page } =
+          await loadCharacters({
+            page: setPage,
+            gender,
+            sort,
+            order,
+            limit,
+          });
         appDispatch(
           loadCharactersState({
             ...state,
+            page,
             loading,
             total,
             pages: pages || state.pages,
@@ -111,6 +113,7 @@ const Main = (props: IProps) => {
     const handleNamesLoad = async (value: string) => {
       if (timers.timeout) clearTimeout(timers.timeout);
       timers.timeout = setTimeout(async () => {
+        localStorage.setItem('searchValue', searchValue);
         const data = await props.searchCharacters(value);
         const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
         appDispatch(addNames(names));

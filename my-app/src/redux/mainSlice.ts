@@ -53,14 +53,18 @@ export const mainSlice = createSlice({
     },
     setSearchParams: (state, action: PayloadAction<ISearchParams>) => {
       const { key, value } = action.payload;
-      const { total, pages } = state.state;
+      const { total, pages, page } = state.state;
       if (key === 'pages' && total) {
         const newLimit = Math.ceil(total / +value);
         state.state.limit = newLimit > 50 ? 50 : newLimit;
-        state.state.pages = newLimit > 50 ? Math.ceil(total / 50) : +value;
+        const newMaxPage = newLimit > 50 ? Math.ceil(total / 50) : +value;
+        state.state.pages = newMaxPage;
+        state.state.page = page <= newMaxPage ? page : newMaxPage;
       } else if (key === 'limit' && total) {
         const newTotalPages = Math.ceil(total / +value);
-        state.state.pages = newTotalPages > 200 ? 200 : newTotalPages;
+        const newMaxPage = newTotalPages > 200 ? 200 : newTotalPages;
+        state.state.pages = newMaxPage;
+        state.state.page = page <= newMaxPage ? page : newMaxPage;
         state.state.limit = newTotalPages > 200 ? Math.ceil(total / 200) : +value;
       } else if (key === 'page') {
         const newValue = +value && +value;

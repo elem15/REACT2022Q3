@@ -15,6 +15,7 @@ export interface IDataLoad {
   errorMessage?: string;
   loading: boolean;
   error: boolean;
+  page: number;
   pages?: number;
   mode: Mode;
   total?: number;
@@ -30,7 +31,7 @@ export interface ILoadCharactersArgs {
   sort: string;
   gender: string;
 }
-export const loadCharacters = async (args: ILoadCharactersArgs) => {
+export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLoad> => {
   const { order, sort } = args;
   const query = Object.entries(args)
     .filter(([key, value]) => key !== 'sort' && key !== 'order' && value)
@@ -47,14 +48,20 @@ export const loadCharacters = async (args: ILoadCharactersArgs) => {
       }
     );
     const { data } = response;
-    return {
-      docs: data.docs,
-      loading: false,
-      pages: data.pages,
-      error: false,
-      mode: Mode.LIST,
-      total: data.total,
-    };
+    if (data.docs.length) {
+      return {
+        docs: data.docs,
+        loading: false,
+        page: data.page,
+        pages: data.pages,
+        error: false,
+        mode: Mode.LIST,
+        total: data.total,
+      };
+    } else {
+      const newArgs = { ...args, page: data.pages };
+      return await loadCharacters(newArgs);
+    }
   } catch (e) {
     const error = e as AxiosError;
     const data = error.response?.data as IErrorData;
@@ -65,6 +72,7 @@ export const loadCharacters = async (args: ILoadCharactersArgs) => {
       errorMessage = data;
     }
     return {
+      page: 1,
       error: true,
       loading: false,
       docs: [],
