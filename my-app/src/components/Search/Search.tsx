@@ -2,7 +2,7 @@ import { IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import React, { FormEvent } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { enableListMode, enableSearchMode, setSearchParams } from 'redux/mainSlice';
+import { enableSearchMode, searchCharactersLoad, setSearchParams } from 'redux/mainSlice';
 import styles from './Search.module.css';
 
 const Search = () => {
@@ -11,7 +11,7 @@ const Search = () => {
   const { searchValue, gender, sort, order, page, limit, pages } = state;
   const handleSortSubmit = (e: FormEvent) => {
     e.preventDefault();
-    appDispatch(enableListMode());
+    appDispatch(searchCharactersLoad());
   };
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();

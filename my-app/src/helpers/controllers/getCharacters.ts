@@ -41,10 +41,10 @@ export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLo
     .filter(([key, value]) => key !== 'sort' && key !== 'order' && key !== 'searchValue' && value)
     .map(([key, value]) => `${key}=${value}`)
     .join('&');
+  const searchParams = `${sort && `&sort=${sort}:${order}`}${searchValue && `&name=${name}`}`;
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${sort && `&sort=${sort}:${order}`}
-        ${searchValue.length && `&name=${name}`}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${searchParams}`,
       {
         headers: {
           'Content-Type': 'application/json',

@@ -13,15 +13,14 @@ import { useForm } from 'react-hook-form';
 import { FormContext, IFormContext } from 'state/context';
 import { schema } from 'components/Form/FormSchema';
 import Detail from 'components/Characters/CharacterDetail';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { addCharacters, loadCharactersState } from 'redux/mainSlice';
+import { useAppDispatch } from 'redux/hooks';
+import { firstCharactersLoad } from 'redux/mainSlice';
 
-const timers = {
+export const timers = {
   timeout: null as NodeJS.Timeout | null,
 };
 
 function App() {
-  const state = useAppSelector((state) => state.main.state);
   const appDispatch = useAppDispatch();
   const {
     register,
@@ -31,32 +30,8 @@ function App() {
     resolver: yupResolver(schema),
   });
   useEffect(() => {
-    const { order, sort, gender, limit } = state;
-    const handleDataLoad = async () => {
-      const { docs, loading, pages, error, errorMessage, total } = await loadCharacters({
-        page: 1,
-        order,
-        sort,
-        gender,
-        limit,
-        searchValue: '',
-      });
-      appDispatch(
-        loadCharactersState({
-          ...state,
-          total,
-          loading,
-          pages: pages || state.pages,
-          error,
-          searchValue: localStorage.getItem('searchValue') || '',
-          errorMessage: errorMessage || undefined,
-        })
-      );
-      appDispatch(addCharacters(docs));
-    };
-    handleDataLoad();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    appDispatch(firstCharactersLoad());
+  }, [appDispatch]);
   return (
     <FormContext.Provider value={{ register, handleSubmit, errors } as IFormContext}>
       <BrowserRouter>

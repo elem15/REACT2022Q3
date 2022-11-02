@@ -2,7 +2,7 @@ import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
-  enableListMode,
+  firstCharactersLoad,
   goToFirstPage,
   goToLastPage,
   goToNextPage,
@@ -15,6 +15,23 @@ const Characters = () => {
   const { docs, state } = useAppSelector((state) => state.main);
   const { mode, page } = state;
   const appDispatch = useAppDispatch();
+  const goToFirst = () => {
+    appDispatch(goToFirstPage());
+    appDispatch(firstCharactersLoad());
+  };
+  const goToPrev = () => {
+    appDispatch(goToPrevPage());
+    appDispatch(firstCharactersLoad());
+  };
+  const goToNext = () => {
+    appDispatch(goToNextPage());
+    appDispatch(firstCharactersLoad());
+  };
+  const goToLast = () => {
+    appDispatch(goToLastPage());
+    appDispatch(firstCharactersLoad());
+  };
+
   return (
     <div>
       {docs.length ? (
@@ -34,17 +51,17 @@ const Characters = () => {
       )}
       {mode === Mode.LIST && (
         <div className="pagination">
-          <button onClick={() => appDispatch(goToFirstPage())}>{'<<'}</button>&nbsp;
-          <button onClick={() => appDispatch(goToPrevPage())}>{'<'}</button>&nbsp;
+          <button onClick={goToFirst}>{'<<'}</button>&nbsp;
+          <button onClick={goToPrev}>{'<'}</button>&nbsp;
           <span>{page}</span>&nbsp;
-          <button onClick={() => appDispatch(goToNextPage())}>{'>'}</button>&nbsp;
-          <button onClick={() => appDispatch(goToLastPage())}>{'>>'}</button>
+          <button onClick={goToNext}>{'>'}</button>&nbsp;
+          <button onClick={goToLast}>{'>>'}</button>
         </div>
       )}
       {mode === Mode.SEARCH && (
         <div className="pagination">
           <button
-            onClick={() => appDispatch(enableListMode())}
+            onClick={() => appDispatch(firstCharactersLoad())}
             className="search-items search-button"
           >
             GO TO LIST

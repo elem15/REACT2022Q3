@@ -1,7 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ICharacter, IName, IState } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
+import { loadCharacters } from 'helpers/controllers/getCharacters';
+import { RootState } from './store';
 
 interface IMainState {
   names: IName[];
@@ -12,7 +14,10 @@ interface ISearchParams {
   key: keyof IState;
   value: string | number;
 }
-
+interface IErrors {
+  error: boolean;
+  errorMessage?: string;
+}
 const initialState: IMainState = {
   names: [],
   docs: [],
@@ -33,6 +38,61 @@ const initialState: IMainState = {
     timer: null,
   },
 };
+
+export const firstCharactersLoad = createAsyncThunk(
+  'main/firstCharactersLoad',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { order, sort, gender, limit, page } = state.main.state;
+    console.log(limit);
+    const { docs, loading, pages, error, errorMessage, total } = await loadCharacters({
+      page,
+      order,
+      sort,
+      gender,
+      limit,
+      searchValue: '',
+    });
+    if (error) return rejectWithValue({ error, errorMessage });
+    dispatch(
+      loadCharactersState({
+        ...state.main.state,
+        total,
+        loading,
+        pages: pages || state.main.state.pages,
+        searchValue: localStorage.getItem('searchValue') || '',
+      })
+    );
+    dispatch(addCharacters(docs));
+  }
+);
+export const searchCharactersLoad = createAsyncThunk(
+  'main/searchCharactersLoad',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { order, sort, gender, limit, page, searchValue } = state.main.state;
+    const { docs, loading, pages, error, errorMessage, mode, total } = await loadCharacters({
+      page,
+      order,
+      sort,
+      gender,
+      limit,
+      searchValue,
+    });
+    if (error) return rejectWithValue({ error, errorMessage });
+    dispatch(
+      loadCharactersState({
+        ...state.main.state,
+        mode,
+        total,
+        loading,
+        pages: pages || state.main.state.pages,
+        searchValue: localStorage.getItem('searchValue') || '',
+      })
+    );
+    dispatch(addCharacters(docs));
+  }
+);
 
 export const mainSlice = createSlice({
   name: 'main',
@@ -115,6 +175,19 @@ export const mainSlice = createSlice({
     setNewTimer: (state, action) => {
       state.state.timer = action.payload;
     },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(firstCharactersLoad.rejected, (state, action) => {
+        const { error, errorMessage } = action.payload as IErrors;
+        state.state.errorMessage = errorMessage;
+        state.state.error = error;
+      })
+      .addCase(searchCharactersLoad.rejected, (state, action) => {
+        const { error, errorMessage } = action.payload as IErrors;
+        state.state.errorMessage = errorMessage;
+        state.state.error = error;
+      });
   },
 });
 

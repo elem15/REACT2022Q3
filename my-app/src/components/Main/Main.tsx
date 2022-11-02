@@ -59,49 +59,8 @@ interface IProps {
 const Main = (props: IProps) => {
   const appDispatch = useAppDispatch();
   const { state } = useAppSelector((state) => state.main);
-  const { page, mode, loading, searchValue, gender, sort, order, limit } = state;
-  const { timers, searchCharacters, loadCharacters } = props;
-  useEffect(() => {
-    if (mode === Mode.LIST && loading === true) {
-      const handleDataLoad = async (setPage: number) => {
-        const { docs, loading, pages, error, mode, errorMessage, total, page } =
-          await loadCharacters({
-            searchValue,
-            page: setPage,
-            gender,
-            sort,
-            order,
-            limit,
-          });
-        appDispatch(
-          loadCharactersState({
-            ...state,
-            page,
-            loading,
-            total,
-            pages: pages || state.pages,
-            error,
-            mode,
-            errorMessage: errorMessage || undefined,
-          })
-        );
-        appDispatch(addCharacters(docs));
-      };
-      handleDataLoad(page);
-    }
-  }, [
-    page,
-    mode,
-    loadCharacters,
-    loading,
-    limit,
-    gender,
-    sort,
-    order,
-    appDispatch,
-    state,
-    searchValue,
-  ]);
+  const { mode, loading, searchValue } = state;
+  const { timers, searchCharacters } = props;
   useEffect(() => {
     if (mode === Mode.SEARCH && loading) {
       const handleDataSearch = async (name: string) => {
@@ -132,8 +91,7 @@ const Main = (props: IProps) => {
       }, 1000);
     };
     handleNamesLoad(searchValue);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue]);
+  }, [appDispatch, props, searchValue, timers]);
   return (
     <div className="App">
       <h1>The Lord of the Rings - search characters</h1>
