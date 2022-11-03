@@ -7,7 +7,6 @@ import About from 'components/About/About';
 import NotFoundPage from 'components/NotFound/NotFoundPage';
 import FormContainer, { IForm } from 'components/Form/FormContainer';
 import { routes } from 'helpers/constants/routes';
-import { searchCharacters, loadCharacters } from 'helpers/controllers/getCharacters';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 import { FormContext, IFormContext } from 'state/context';
@@ -15,10 +14,6 @@ import { schema } from 'components/Form/FormSchema';
 import Detail from 'components/Characters/CharacterDetail';
 import { useAppDispatch } from 'redux/hooks';
 import { firstCharactersLoad } from 'redux/mainSlice';
-
-export const timers = {
-  timeout: null as NodeJS.Timeout | null,
-};
 
 function App() {
   const appDispatch = useAppDispatch();
@@ -37,16 +32,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path={routes.BASE_URL} element={<Layout />}>
-            <Route
-              index
-              element={
-                <Main
-                  searchCharacters={searchCharacters}
-                  loadCharacters={loadCharacters}
-                  timers={timers}
-                />
-              }
-            />
+            <Route index element={<Main />} />
             <Route path={routes.DETAIL} element={<Detail />} />
             <Route path={routes.FORM} element={<FormContainer />} />
             <Route path={routes.ABOUT} element={<About />} />

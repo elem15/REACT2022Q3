@@ -2,11 +2,11 @@ import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
 import {
-  firstCharactersLoad,
   goToFirstPage,
   goToLastPage,
   goToNextPage,
   goToPrevPage,
+  searchCharactersLoad,
 } from 'redux/mainSlice';
 import Character from './Character';
 import './Characters.css';
@@ -17,19 +17,19 @@ const Characters = () => {
   const appDispatch = useAppDispatch();
   const goToFirst = () => {
     appDispatch(goToFirstPage());
-    appDispatch(firstCharactersLoad());
+    appDispatch(searchCharactersLoad());
   };
   const goToPrev = () => {
     appDispatch(goToPrevPage());
-    appDispatch(firstCharactersLoad());
+    appDispatch(searchCharactersLoad());
   };
   const goToNext = () => {
     appDispatch(goToNextPage());
-    appDispatch(firstCharactersLoad());
+    appDispatch(searchCharactersLoad());
   };
   const goToLast = () => {
     appDispatch(goToLastPage());
-    appDispatch(firstCharactersLoad());
+    appDispatch(searchCharactersLoad());
   };
 
   return (
@@ -61,7 +61,7 @@ const Characters = () => {
       {mode === Mode.SEARCH && (
         <div className="pagination">
           <button
-            onClick={() => appDispatch(firstCharactersLoad())}
+            onClick={() => appDispatch(searchCharactersLoad())}
             className="search-items search-button"
           >
             GO TO LIST

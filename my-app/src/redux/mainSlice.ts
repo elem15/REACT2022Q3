@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
 import { ICharacter, IName, IState } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
-import { loadCharacters } from 'helpers/controllers/getCharacters';
+import { loadCharacters, searchCharacters } from 'helpers/controllers/getCharacters';
 import { RootState } from './store';
 
 interface IMainState {
@@ -15,7 +15,6 @@ interface ISearchParams {
   value: string | number;
 }
 interface IErrors {
-  error: boolean;
   errorMessage?: string;
 }
 const initialState: IMainState = {
@@ -44,8 +43,7 @@ export const firstCharactersLoad = createAsyncThunk(
   async (_, { rejectWithValue, dispatch, getState }) => {
     const state = getState() as RootState;
     const { order, sort, gender, limit, page } = state.main.state;
-    console.log(limit);
-    const { docs, loading, pages, error, errorMessage, total } = await loadCharacters({
+    const { docs, pages, error, errorMessage, total } = await loadCharacters({
       page,
       order,
       sort,
@@ -53,12 +51,11 @@ export const firstCharactersLoad = createAsyncThunk(
       limit,
       searchValue: '',
     });
-    if (error) return rejectWithValue({ error, errorMessage });
+    if (error) return rejectWithValue({ errorMessage });
     dispatch(
       loadCharactersState({
         ...state.main.state,
         total,
-        loading,
         pages: pages || state.main.state.pages,
         searchValue: localStorage.getItem('searchValue') || '',
       })
@@ -71,7 +68,15 @@ export const searchCharactersLoad = createAsyncThunk(
   async (_, { rejectWithValue, dispatch, getState }) => {
     const state = getState() as RootState;
     const { order, sort, gender, limit, page, searchValue } = state.main.state;
-    const { docs, loading, pages, error, errorMessage, mode, total } = await loadCharacters({
+    const {
+      docs,
+      pages,
+      error,
+      errorMessage,
+      mode,
+      total,
+      page: newPageNumber,
+    } = await loadCharacters({
       page,
       order,
       sort,
@@ -79,13 +84,13 @@ export const searchCharactersLoad = createAsyncThunk(
       limit,
       searchValue,
     });
-    if (error) return rejectWithValue({ error, errorMessage });
+    if (error) return rejectWithValue({ errorMessage });
     dispatch(
       loadCharactersState({
         ...state.main.state,
+        page: newPageNumber,
         mode,
         total,
-        loading,
         pages: pages || state.main.state.pages,
         searchValue: localStorage.getItem('searchValue') || '',
       })
@@ -93,7 +98,75 @@ export const searchCharactersLoad = createAsyncThunk(
     dispatch(addCharacters(docs));
   }
 );
+export const searchCharactersThunk = createAsyncThunk(
+  'main/searchCharactersThunk',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { searchValue } = state.main.state;
+    const { docs, error, mode, errorMessage } = await searchCharacters(searchValue);
+    if (error) return rejectWithValue({ errorMessage });
+    dispatch(
+      loadCharactersState({
+        ...state.main.state,
+        mode,
+        searchValue: '',
+      })
+    );
+    dispatch(addCharacters(docs));
+  }
+);
+const timers = {
+  timeout: null as NodeJS.Timeout | null,
+};
 
+export const searchNamesThunk = createAsyncThunk(
+  'main/searchNamesThunk',
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    const state = getState() as RootState;
+    const { searchValue } = state.main.state;
+    if (timers.timeout) clearTimeout(timers.timeout);
+    timers.timeout = setTimeout(async () => {
+      localStorage.setItem('searchValue', searchValue);
+      const data = await searchCharacters(searchValue);
+      const { error, errorMessage } = data;
+      if (error) return rejectWithValue({ errorMessage });
+      const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
+      dispatch(addNames(names));
+    }, 1000);
+  }
+);
+type IAction = PayloadAction<
+  unknown,
+  string,
+  {
+    arg: void;
+    requestId: string;
+    requestStatus: 'rejected';
+    aborted: boolean;
+    condition: boolean;
+  } & (
+    | {
+        rejectedWithValue: true;
+      }
+    | ({
+        rejectedWithValue: false;
+        // eslint-disable-next-line @typescript-eslint/ban-types
+      } & {})
+  ),
+  SerializedError
+>;
+const errorHandler = (state: IMainState, action: IAction) => {
+  const { errorMessage } = action.payload as IErrors;
+  state.state.errorMessage = errorMessage;
+  state.state.error = true;
+  state.state.loading = false;
+};
+const loaderHandler = (state: IMainState) => {
+  state.state.loading = true;
+};
+const dataHandler = (state: IMainState) => {
+  state.state.loading = false;
+};
 export const mainSlice = createSlice({
   name: 'main',
   initialState,
@@ -168,26 +241,22 @@ export const mainSlice = createSlice({
     createDetailPage: (state, action) => {
       state.state.modalDoc = state.docs.find((item) => item._id === action.payload) || null;
     },
-    removeTimer: (state) => {
-      const { timer } = state.state;
-      if (timer) clearTimeout(timer);
-    },
-    setNewTimer: (state, action) => {
-      state.state.timer = action.payload;
-    },
   },
   extraReducers(builder) {
     builder
-      .addCase(firstCharactersLoad.rejected, (state, action) => {
-        const { error, errorMessage } = action.payload as IErrors;
-        state.state.errorMessage = errorMessage;
-        state.state.error = error;
-      })
-      .addCase(searchCharactersLoad.rejected, (state, action) => {
-        const { error, errorMessage } = action.payload as IErrors;
-        state.state.errorMessage = errorMessage;
-        state.state.error = error;
-      });
+      .addCase(firstCharactersLoad.pending, loaderHandler)
+      .addCase(firstCharactersLoad.fulfilled, dataHandler)
+      .addCase(firstCharactersLoad.rejected, errorHandler)
+
+      .addCase(searchCharactersLoad.pending, loaderHandler)
+      .addCase(searchCharactersLoad.fulfilled, dataHandler)
+      .addCase(searchCharactersLoad.rejected, errorHandler)
+
+      .addCase(searchCharactersThunk.pending, loaderHandler)
+      .addCase(searchCharactersThunk.fulfilled, dataHandler)
+      .addCase(searchCharactersThunk.rejected, errorHandler)
+
+      .addCase(searchNamesThunk.rejected, errorHandler);
   },
 });
 
@@ -204,8 +273,6 @@ export const {
   enableListMode,
   createDetailPage,
   setSearchParams,
-  removeTimer,
-  setNewTimer,
 } = mainSlice.actions;
 
 export default mainSlice.reducer;

@@ -1,8 +1,13 @@
 import { IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
-import React, { FormEvent } from 'react';
+import React, { FormEvent, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { enableSearchMode, searchCharactersLoad, setSearchParams } from 'redux/mainSlice';
+import {
+  searchCharactersThunk,
+  searchCharactersLoad,
+  setSearchParams,
+  searchNamesThunk,
+} from 'redux/mainSlice';
 import styles from './Search.module.css';
 
 const Search = () => {
@@ -15,13 +20,16 @@ const Search = () => {
   };
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault();
-    appDispatch(enableSearchMode());
+    appDispatch(searchCharactersThunk());
   };
   const handleOnChange = async (e: FormEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { value, name } = e.target as HTMLInputElement;
     const key = name as keyof IState;
     appDispatch(setSearchParams({ value, key }));
   };
+  useEffect(() => {
+    appDispatch(searchNamesThunk());
+  }, [appDispatch, searchValue]);
   return (
     <section className={styles.searchSection}>
       <form className={styles.searchForm} onSubmit={handleSearchSubmit}>

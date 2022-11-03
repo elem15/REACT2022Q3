@@ -1,14 +1,12 @@
 import Characters from 'components/Characters/Characters';
 import Search from 'components/Search/Search';
 import { Mode } from 'helpers/constants/mode';
-import React, { useEffect } from 'react';
+import React from 'react';
 import './Main.css';
-import { IDataLoad, IDataSearch, ILoadCharactersArgs } from 'helpers/controllers/getCharacters';
 import Preloader from 'components/Preloader/Preloader';
 import NetworkError from 'components/NetworkError/NetworkError';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
-import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { addCharacters, addNames, loadCharactersState } from 'redux/mainSlice';
+import { useAppSelector } from 'redux/hooks';
 
 export interface ICharacter {
   _id: string;
@@ -50,48 +48,9 @@ export interface IState {
   gender: GenderType;
   timer: NodeJS.Timeout | null;
 }
-interface IProps {
-  timers: { timeout: NodeJS.Timeout | null };
-  searchCharacters: (name: string) => Promise<IDataSearch>;
-  loadCharacters: ({ page, order, sort, gender }: ILoadCharactersArgs) => Promise<IDataLoad>;
-}
 
-const Main = (props: IProps) => {
-  const appDispatch = useAppDispatch();
+const Main = () => {
   const { state } = useAppSelector((state) => state.main);
-  const { mode, loading, searchValue } = state;
-  const { timers, searchCharacters } = props;
-  useEffect(() => {
-    if (mode === Mode.SEARCH && loading) {
-      const handleDataSearch = async (name: string) => {
-        const { docs, loading, error, mode, errorMessage } = await searchCharacters(name);
-        appDispatch(
-          loadCharactersState({
-            ...state,
-            loading,
-            error,
-            mode,
-            errorMessage,
-            searchValue: '',
-          })
-        );
-        appDispatch(addCharacters(docs));
-      };
-      handleDataSearch(searchValue);
-    }
-  }, [loading, mode, searchCharacters, searchValue, appDispatch, state]);
-  useEffect(() => {
-    const handleNamesLoad = async (value: string) => {
-      if (timers.timeout) clearTimeout(timers.timeout);
-      timers.timeout = setTimeout(async () => {
-        localStorage.setItem('searchValue', searchValue);
-        const data = await props.searchCharacters(value);
-        const names = data.docs.map(({ name, _id }) => ({ name, id: _id }));
-        appDispatch(addNames(names));
-      }, 1000);
-    };
-    handleNamesLoad(searchValue);
-  }, [appDispatch, props, searchValue, timers]);
   return (
     <div className="App">
       <h1>The Lord of the Rings - search characters</h1>
