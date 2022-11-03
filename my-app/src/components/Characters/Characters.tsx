@@ -13,7 +13,7 @@ import './Characters.css';
 
 const Characters = () => {
   const { docs, state } = useAppSelector((state) => state.main);
-  const { mode, page } = state;
+  const { mode, page, pages } = state;
   const appDispatch = useAppDispatch();
   const goToFirst = () => {
     appDispatch(goToFirstPage());
@@ -51,11 +51,22 @@ const Characters = () => {
       )}
       {mode === Mode.LIST && (
         <div className="pagination">
-          <button onClick={goToFirst}>{'<<'}</button>&nbsp;
-          <button onClick={goToPrev}>{'<'}</button>&nbsp;
+          <button disabled={page === 1} onClick={goToFirst}>
+            {'<<'}
+          </button>
+          &nbsp;
+          <button disabled={page === 1} onClick={goToPrev}>
+            {'<'}
+          </button>
+          &nbsp;
           <span>{page}</span>&nbsp;
-          <button onClick={goToNext}>{'>'}</button>&nbsp;
-          <button onClick={goToLast}>{'>>'}</button>
+          <button disabled={page === pages} onClick={goToNext}>
+            {'>'}
+          </button>
+          &nbsp;
+          <button disabled={page === pages} onClick={goToLast}>
+            {'>>'}
+          </button>
         </div>
       )}
       {mode === Mode.SEARCH && (
