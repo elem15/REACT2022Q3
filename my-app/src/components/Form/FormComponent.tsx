@@ -1,15 +1,14 @@
 import Cards from 'components/Cards/Cards';
-import React, { useContext } from 'react';
+import React from 'react';
 import { FieldValues } from 'react-hook-form/dist/types';
 import './Form.css';
-import { FormContext } from 'state/context';
 import { useAppSelector } from 'redux/hooks';
 
 interface IFormComponentProps {
   submitForm: (data: FieldValues) => void;
 }
 const FormComponent = (props: IFormComponentProps) => {
-  const { register, handleSubmit, errors } = useContext(FormContext);
+  const { register, handleSubmit, errors } = useAppSelector((state) => state.cards.form);
   const cards = useAppSelector((state) => state.cards.cards);
   if (handleSubmit && register && errors) {
     return (

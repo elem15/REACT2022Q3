@@ -135,7 +135,7 @@ export const searchNamesThunk = createAsyncThunk(
     }, 1000);
   }
 );
-type IAction = PayloadAction<
+export type IAction = PayloadAction<
   unknown,
   string,
   {
@@ -150,8 +150,7 @@ type IAction = PayloadAction<
       }
     | ({
         rejectedWithValue: false;
-        // eslint-disable-next-line @typescript-eslint/ban-types
-      } & {})
+      } & Record<string, unknown>)
   ),
   SerializedError
 >;
