@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { ICharacter, IDocs } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
+import queryString from 'query-string';
 
 export interface IDataSearch {
   docs: ICharacter[];
@@ -27,24 +28,31 @@ export interface IErrorData {
 export interface ILoadCharactersArgs {
   page: number;
   limit: number;
-  order: string;
-  sort: string;
+  order?: string;
+  sort?: string;
   gender: string;
-  searchValue: string;
+  searchValue?: string;
 }
 export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLoad> => {
   const { order, sort, searchValue } = args;
-  const bracketIndex = searchValue.indexOf('(');
-  const correctName = bracketIndex > -1 ? searchValue.slice(0, bracketIndex) : searchValue;
-  const name = new RegExp(correctName, 'i');
-  const query = Object.entries(args)
-    .filter(([key, value]) => key !== 'sort' && key !== 'order' && key !== 'searchValue' && value)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
-  const searchParams = `${sort && `&sort=${sort}:${order}`}${searchValue && `&name=${name}`}`;
+  const newArgs = { ...args };
+  delete newArgs.order;
+  delete newArgs.sort;
+  delete newArgs.searchValue;
+  let name;
+  if (searchValue) {
+    const bracketIndex = searchValue.indexOf('(');
+    const correctName = bracketIndex > -1 ? searchValue.slice(0, bracketIndex) : searchValue;
+    name = new RegExp(correctName, 'i');
+  }
+  const searchParams = `${sort && `&sort=${sort}:${order}`}`;
+  const queryStr = queryString.stringify(
+    { ...newArgs, name },
+    { skipEmptyString: true, skipNull: true }
+  );
   try {
     const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${query}${searchParams}`,
+      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${queryStr}${searchParams}`,
       {
         headers: {
           'Content-Type': 'application/json',

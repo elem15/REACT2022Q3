@@ -13,7 +13,7 @@ import { schema } from 'components/Form/FormSchema';
 import Detail from 'components/Characters/CharacterDetail';
 import { useAppDispatch } from 'redux/hooks';
 import { firstCharactersLoad } from 'redux/mainSlice';
-import { setFormState } from 'redux/cardsSlice';
+import { FormContext, IFormContext } from 'state/context';
 
 function App() {
   const appDispatch = useAppDispatch();
@@ -24,23 +24,24 @@ function App() {
   } = useForm<IForm>({
     resolver: yupResolver(schema),
   });
-  appDispatch(setFormState({ register, handleSubmit, errors }));
   useEffect(() => {
     appDispatch(firstCharactersLoad());
   }, [appDispatch]);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path={routes.BASE_URL} element={<Layout />}>
-          <Route index element={<Main />} />
-          <Route path={routes.DETAIL} element={<Detail />} />
-          <Route path={routes.FORM} element={<FormContainer />} />
-          <Route path={routes.ABOUT} element={<About />} />
-          <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
-          <Route path={routes.NOT_DEFINED} element={<Navigate to={routes.NOT_FOUND} replace />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <FormContext.Provider value={{ register, handleSubmit, errors } as IFormContext}>
+      <BrowserRouter>
+        <Routes>
+          <Route path={routes.BASE_URL} element={<Layout />}>
+            <Route index element={<Main />} />
+            <Route path={routes.DETAIL} element={<Detail />} />
+            <Route path={routes.FORM} element={<FormContainer />} />
+            <Route path={routes.ABOUT} element={<About />} />
+            <Route path={routes.NOT_FOUND} element={<NotFoundPage />} />
+            <Route path={routes.NOT_DEFINED} element={<Navigate to={routes.NOT_FOUND} replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </FormContext.Provider>
   );
 }
 
