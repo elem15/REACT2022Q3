@@ -10,10 +10,6 @@ interface IMainState {
   docs: ICharacter[] | [];
   state: IState;
 }
-interface ISearchParams {
-  key: keyof IState;
-  value: string | number;
-}
 interface IErrors {
   errorMessage?: string;
 }
@@ -29,11 +25,11 @@ const initialState: IMainState = {
     pages: 0,
     total: 0,
     limit: 10,
-    mode: Mode.LIST,
-    modalDoc: null,
     order: SortingOrder.ASC,
     sort: SortingValues.DEFAULT,
     gender: GenderType.DEFAULT,
+    mode: Mode.LIST,
+    modalDoc: null,
     timer: null,
   },
 };
@@ -173,6 +169,9 @@ export const mainSlice = createSlice({
     addNames: (state, action: PayloadAction<IName[]>) => {
       state.names = action.payload;
     },
+    addSearchParams: (state, action) => {
+      state.state = { ...state.state, ...action.payload };
+    },
     addCharacters: (state, action: PayloadAction<ICharacter[]>) => {
       state.docs = action.payload;
     },
@@ -183,27 +182,8 @@ export const mainSlice = createSlice({
       state.state.page = action.payload;
       state.state.loading = true;
     },
-    setSearchParams: (state, action: PayloadAction<ISearchParams>) => {
-      const { key, value } = action.payload;
-      const { total, pages, page } = state.state;
-      if (key === 'pages' && total) {
-        const newLimit = Math.ceil(total / +value);
-        state.state.limit = newLimit > 50 ? 50 : newLimit;
-        const newMaxPage = newLimit > 50 ? Math.ceil(total / 50) : +value;
-        state.state.pages = newMaxPage;
-        state.state.page = page <= newMaxPage ? page : newMaxPage;
-      } else if (key === 'limit' && total) {
-        const newTotalPages = Math.ceil(total / +value);
-        const newMaxPage = newTotalPages > 200 ? 200 : newTotalPages;
-        state.state.pages = newMaxPage;
-        state.state.page = page <= newMaxPage ? page : newMaxPage;
-        state.state.limit = newTotalPages > 200 ? Math.ceil(total / 200) : +value;
-      } else if (key === 'page') {
-        const newValue = +value && +value;
-        state.state.page = newValue <= pages ? newValue : pages;
-      } else {
-        state.state = { ...state.state, [key]: +value ? +value : value };
-      }
+    setSearchName: (state, action) => {
+      state.state.searchValue = action.payload;
     },
     enableSearchMode: (state) => {
       state.state.loading = true;
@@ -271,7 +251,8 @@ export const {
   goToLastPage,
   enableListMode,
   createDetailPage,
-  setSearchParams,
+  addSearchParams,
+  setSearchName,
 } = mainSlice.actions;
 
 export default mainSlice.reducer;
