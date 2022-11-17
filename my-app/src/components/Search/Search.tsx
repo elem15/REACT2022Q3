@@ -16,7 +16,6 @@ const Search = () => {
   const { names, state } = useAppSelector((state) => state.main);
   const { searchValue, gender, sort, order, page, limit, pages, total } = state;
   const initLocalState = {
-    searchValue,
     page,
     pages,
     total,

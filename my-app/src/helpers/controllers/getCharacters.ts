@@ -2,7 +2,6 @@ import axios, { AxiosError } from 'axios';
 import { ICharacter, IDocs } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { routes } from 'helpers/constants/routes';
-import queryString from 'query-string';
 
 export interface IDataSearch {
   docs: ICharacter[];
@@ -45,21 +44,21 @@ export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLo
     const correctName = bracketIndex > -1 ? searchValue.slice(0, bracketIndex) : searchValue;
     name = new RegExp(correctName, 'i');
   }
-  const searchParams = `${sort && `&sort=${sort}:${order}`}`;
-  const queryStr = queryString.stringify(
-    { ...newArgs, name },
-    { skipEmptyString: true, skipNull: true }
-  );
+  const params = { ...newArgs, name, sort: sort && `${sort}:${order}` };
+  for (const key in params) {
+    const k = key as keyof ILoadCharactersArgs;
+    if (!params[k]) {
+      delete params[k];
+    }
+  }
   try {
-    const response = await axios.get<IDocs>(
-      `${routes.RINGS_BASE_URL + routes.CHARACTER}?${queryStr}${searchParams}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
-        },
-      }
-    );
+    const response = await axios.get<IDocs>(`${routes.RINGS_BASE_URL + routes.CHARACTER}`, {
+      params,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer nsE8y9-1ROOhOc94FITF',
+      },
+    });
     const { data } = response;
     if (data.docs.length) {
       return {
@@ -72,8 +71,11 @@ export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLo
         total: data.total,
       };
     } else {
-      const newArgs = { ...args, page: data.pages };
-      return await loadCharacters(newArgs);
+      const result = await searchCharacters(searchValue as string);
+      if (!result.error) {
+        const newArgs = { ...args, page: data.pages };
+        return await loadCharacters(newArgs);
+      } else throw new Error(result.errorMessage);
     }
   } catch (e) {
     const error = e as AxiosError;
