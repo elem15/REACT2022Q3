@@ -12,7 +12,7 @@ import { useForm } from 'react-hook-form';
 import { schema } from 'components/Form/FormSchema';
 import Detail from 'components/Characters/CharacterDetail';
 import { useAppDispatch } from 'redux/hooks';
-import { firstCharactersLoad } from 'redux/mainSlice';
+import { firstCharactersLoad } from 'redux/asyncThunks';
 import { FormContext, IFormContext } from 'state/context';
 
 function App() {

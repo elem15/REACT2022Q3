@@ -72,7 +72,8 @@ export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLo
       };
     } else {
       const result = await searchCharacters(searchValue as string);
-      if (!result.error) {
+      const docs = await result.docs;
+      if (docs.length !== 0) {
         const newArgs = { ...args, page: data.pages };
         return await loadCharacters(newArgs);
       } else throw new Error(result.errorMessage);

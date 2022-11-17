@@ -1,19 +1,15 @@
 import { IState } from 'components/Main/Main';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import React, { FormEvent, useEffect, useState } from 'react';
+import { searchCharactersLoad, searchCharactersThunk, searchNamesThunk } from 'redux/asyncThunks';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import {
-  searchCharactersThunk,
-  searchCharactersLoad,
-  searchNamesThunk,
-  addSearchParams,
-  setSearchName,
-} from 'redux/mainSlice';
+import { addSearchParams, setSearchName } from 'redux/mainSlice';
 import styles from './Search.module.css';
 
 const Search = () => {
   const appDispatch = useAppDispatch();
-  const { names, state } = useAppSelector((state) => state.main);
+  const { state } = useAppSelector((state) => state.main);
+  const names = useAppSelector((state) => state.names);
   const { searchValue, gender, sort, order, page, limit, pages, total } = state;
   const initLocalState = {
     page,
@@ -89,7 +85,7 @@ const Search = () => {
           onChange={handleSearchChange}
         />
         <datalist id="search">
-          {names.map(({ name, id }, idx) => idx < 10 && <option key={id} value={name} />)}
+          {names.names.map(({ name, id }, idx) => idx < 10 && <option key={id} value={name} />)}
         </datalist>
         <br />
         <button className="search-items search-button">search by name</button>
