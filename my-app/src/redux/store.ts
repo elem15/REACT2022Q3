@@ -1,8 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
-import cardsReducer from './cardsSlice';
-import mainReducer from './mainSlice';
-import namesReducer from './namesSlice';
-import charactersSlice from './charactersSlice';
+import cardsReducer from './slices/cardsSlice';
+import mainReducer from './slices/mainSlice';
+import namesReducer from './slices/namesSlice';
+import charactersSlice from './slices/charactersSlice';
 
 const store = configureStore({
   reducer: {

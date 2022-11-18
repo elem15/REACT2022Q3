@@ -2,7 +2,7 @@ import { routes } from 'helpers/constants/routes';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from 'redux/hooks';
-import { createDetailPage } from 'redux/charactersSlice';
+import { createDetailPage } from 'redux/slices/charactersSlice';
 import './Characters.css';
 
 interface IProps {

@@ -2,7 +2,7 @@ import { Mode } from 'helpers/constants/mode';
 import React from 'react';
 import { searchCharactersLoad } from 'redux/asyncThunks';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { goToFirstPage, goToLastPage, goToNextPage, goToPrevPage } from 'redux/mainSlice';
+import { goToFirstPage, goToLastPage, goToNextPage, goToPrevPage } from 'redux/slices/mainSlice';
 import Character from './Character';
 import './Characters.css';
 

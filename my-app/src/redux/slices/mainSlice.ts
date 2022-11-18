@@ -7,7 +7,7 @@ import {
   searchCharactersLoad,
   searchCharactersThunk,
   searchNamesThunk,
-} from './asyncThunks';
+} from '../asyncThunks';
 
 interface IMainState {
   state: IState;

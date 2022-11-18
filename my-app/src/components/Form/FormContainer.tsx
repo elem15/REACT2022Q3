@@ -4,7 +4,7 @@ import './Form.css';
 import FormComponent from './FormComponent';
 import { FieldValues } from 'react-hook-form';
 import { useAppDispatch } from 'redux/hooks';
-import { addCard } from 'redux/cardsSlice';
+import { addCard } from 'redux/slices/cardsSlice';
 
 export interface IForm {
   address: string;

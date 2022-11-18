@@ -3,7 +3,7 @@ import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorti
 import React, { FormEvent, useEffect, useState } from 'react';
 import { searchCharactersLoad, searchCharactersThunk, searchNamesThunk } from 'redux/asyncThunks';
 import { useAppDispatch, useAppSelector } from 'redux/hooks';
-import { addSearchParams, setSearchName } from 'redux/mainSlice';
+import { addSearchParams, setSearchName } from 'redux/slices/mainSlice';
 import styles from './Search.module.css';
 
 const Search = () => {

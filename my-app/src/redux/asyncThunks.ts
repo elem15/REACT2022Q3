@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { loadCharacters, searchCharacters } from 'helpers/controllers/getCharacters';
-import { addCharacters } from './charactersSlice';
-import { loadCharactersState } from './mainSlice';
-import { addNames } from './namesSlice';
+import { addCharacters } from './slices/charactersSlice';
+import { loadCharactersState } from './slices/mainSlice';
+import { addNames } from './slices/namesSlice';
 import { RootState } from './store';
 
 export const firstCharactersLoad = createAsyncThunk(
