@@ -70,13 +70,16 @@ export const loadCharacters = async (args: ILoadCharactersArgs): Promise<IDataLo
         mode: Mode.LIST,
         total: data.total,
       };
-    } else {
+    } else if (searchValue) {
       const result = await searchCharacters(searchValue as string);
       const docs = await result.docs;
-      if (docs.length !== 0) {
+      if (docs.length) {
         const newArgs = { ...args, page: data.pages };
         return await loadCharacters(newArgs);
       } else throw new Error(result.errorMessage);
+    } else {
+      const newArgs = { ...args, page: data.pages };
+      return await loadCharacters(newArgs);
     }
   } catch (e) {
     const error = e as AxiosError;
