@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, SerializedError } from '@reduxjs/toolkit';
-import { ICharacter, IState } from 'components/Main/Main';
+import { IState } from 'components/Main/Main';
 import { Mode } from 'helpers/constants/mode';
 import { GenderType, SortingOrder, SortingValues } from 'helpers/constants/sorting';
 import {
@@ -10,14 +10,12 @@ import {
 } from './asyncThunks';
 
 interface IMainState {
-  docs: ICharacter[] | [];
   state: IState;
 }
 interface IErrors {
   errorMessage?: string;
 }
 const initialState: IMainState = {
-  docs: [],
   state: {
     loading: true,
     error: false,
@@ -31,7 +29,6 @@ const initialState: IMainState = {
     sort: SortingValues.DEFAULT,
     gender: GenderType.DEFAULT,
     mode: Mode.LIST,
-    modalDoc: null,
     timer: null,
   },
 };
@@ -63,20 +60,18 @@ const errorHandler = (state: IMainState, action: IAction) => {
 };
 const loaderHandler = (state: IMainState) => {
   state.state.loading = true;
+  state.state.error = false;
 };
 const dataHandler = (state: IMainState) => {
   state.state.loading = false;
+  state.state.error = false;
 };
-export const mainSlice = createSlice({
+const mainSlice = createSlice({
   name: 'main',
   initialState,
   reducers: {
     addSearchParams: (state, action) => {
       state.state = { ...state.state, ...action.payload };
-    },
-    addCharacters: (state, action: PayloadAction<ICharacter[]>) => {
-      state.state.error = false;
-      state.docs = action.payload;
     },
     loadCharactersState: (state, action: PayloadAction<IState>) => {
       state.state = action.payload;
@@ -120,9 +115,6 @@ export const mainSlice = createSlice({
         state.state.loading = true;
       }
     },
-    createDetailPage: (state, action) => {
-      state.state.modalDoc = state.docs.find((item) => item._id === action.payload) || null;
-    },
   },
   extraReducers(builder) {
     builder
@@ -143,7 +135,6 @@ export const mainSlice = createSlice({
 });
 
 export const {
-  addCharacters,
   loadCharactersState,
   changePage,
   enableSearchMode,
@@ -152,7 +143,6 @@ export const {
   goToFirstPage,
   goToLastPage,
   enableListMode,
-  createDetailPage,
   addSearchParams,
   setSearchName,
 } = mainSlice.actions;

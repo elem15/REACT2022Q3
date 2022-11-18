@@ -4,8 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAppSelector } from 'redux/hooks';
 
 const Detail = () => {
-  const state = useAppSelector((state) => state.main.state);
-  const { modalDoc, page } = state;
+  const { page } = useAppSelector((state) => state.main.state);
+  const { modalDoc } = useAppSelector((state) => state.characters);
   const navigate = useNavigate();
 
   useEffect(() => {

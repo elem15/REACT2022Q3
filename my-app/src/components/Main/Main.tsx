@@ -42,7 +42,6 @@ export interface IState {
   total?: number;
   limit: number;
   mode: Mode;
-  modalDoc: ICharacter | null;
   order: SortingOrder;
   sort: SortingValues;
   gender: GenderType;

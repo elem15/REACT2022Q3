@@ -21,6 +21,10 @@ const Search = () => {
     gender,
   };
   const [localState, setLocalState] = useState(initLocalState);
+  useEffect(() => {
+    setLocalState({ ...localState, page, limit, pages, total });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [limit, page, pages, total]);
   const handleSortSubmit = (e: FormEvent) => {
     e.preventDefault();
     appDispatch(addSearchParams(localState));

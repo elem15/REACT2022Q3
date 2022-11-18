@@ -23,7 +23,7 @@ const initialState: CardsState = {
   form: {},
 };
 
-export const cardSlice = createSlice({
+const cardSlice = createSlice({
   name: 'cards',
   initialState,
   reducers: {

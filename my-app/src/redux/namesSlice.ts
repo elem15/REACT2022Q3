@@ -3,7 +3,7 @@ import { IName } from 'components/Main/Main';
 
 const initialState = { names: [] as IName[] };
 
-export const namesSlice = createSlice({
+const namesSlice = createSlice({
   name: 'names',
   initialState,
   reducers: {

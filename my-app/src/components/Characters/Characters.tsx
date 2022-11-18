@@ -7,7 +7,8 @@ import Character from './Character';
 import './Characters.css';
 
 const Characters = () => {
-  const { docs, state } = useAppSelector((state) => state.main);
+  const { state } = useAppSelector((state) => state.main);
+  const { docs } = useAppSelector((state) => state.characters);
   const { mode, page, pages } = state;
   const appDispatch = useAppDispatch();
   const goToFirst = () => {
