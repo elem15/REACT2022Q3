@@ -1,0 +1,27 @@
+.searchSection {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 2em 3em;
+  margin: 1em 1em;
+  background-color: aqua;
+  border-radius: 5px;
+  gap: 4em 8em;
+}
+
+.searchForm {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.search-button {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.search-items {
+  padding: 0.2em 0.4em;
+  border-radius: 0.5em;  
+  font-size: 1.2rem;
+}

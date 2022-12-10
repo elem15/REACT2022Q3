@@ -1,0 +1,22 @@
+.layout {
+  display: flex;
+  gap: 2em;
+  width: 100%;
+}
+
+
+.nav-list {
+  list-style: none;
+  margin-top: 30px;
+}
+
+@media (max-width: 576px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .nav-list {
+    display: flex;
+    column-gap: 1em;
+  }
+}

@@ -1,0 +1,73 @@
+.wrapper {
+  width: 100%;
+}
+.section {
+  display: flex;
+  flex-grow: 1;  
+  justify-content: left;
+  padding: 2em 3em;
+  margin: 1em 1em;
+  background-color: aqua;
+  border-radius: 5px;
+}
+
+.search-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.search-button {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.search-items {
+  padding: 0.2em 0.4em;
+  border-radius: 0.5em;  
+  font-size: 1.2rem;
+}
+
+.alert {
+  color: red;
+  font-size: 0.8em;
+}
+
+ /* toggle in label designing */
+ .toggle {
+   position: relative;
+   display: inline-block;
+   width: 20px;
+   height: 11px;
+   background-color: green;
+   border-radius: 30px;
+   border: 2px solid gray;
+ }
+
+ /* After slide changes */
+ .toggle:after {
+   content: '';
+   position: absolute;
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   background-color: gray;
+   top: .5px;
+   left: 1px;
+   transition: all 0.5s;
+ }
+
+ .checkbox:checked+.toggle::after {
+   left: 9px;
+ }
+
+ /* Checkbox checked toggle label bg color */
+ .checkbox:checked+.toggle {
+   background-color: red;
+ }
+
+ /* Checkbox vanished */
+ .checkbox {
+   display: none;
+ }
